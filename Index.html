@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบบันทึกใบประวัตินักศึกษา</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.25s ease-out; }
+        .tab-btn { transition: all 0.2s ease-in-out; }
+        .tab-btn.active { 
+            border-bottom: 4px solid #2563eb; 
+            color: #2563eb; 
+            font-weight: 700;
+            background-color: #eff6ff;
+        }
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .scrollbar-none::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .scrollbar-none {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        input[type="text"], input[type="date"], input[type="number"], select, textarea {
+            width: 100%; 
+            padding: 0.75rem; 
+            border: 1px solid #cbd5e1; 
+            border-radius: 0.5rem;
+            background-color: #f8fafc;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="p-2 sm:p-4 md:p-6 lg:p-8">
+    <div class="max-w-6xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden border border-slate-200">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white p-6 md:p-8 relative">
+            <button type="button" onclick="goToAdmin()" class="absolute top-4 right-4 bg-white/10 hover:bg-white/20 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide border border-white/20 transition flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                สำหรับผู้ดูแล (Admin)
+            </button>
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-center tracking-wide">ระบบบันทึกใบประวัตินักศึกษา</h1>
+            <p class="text-center text-blue-100/90 mt-2 text-xs sm:text-sm font-light">กรุณากรอกประวัติส่วนตัวอย่างละเอียดและถูกต้อง เพื่อใช้ในการจัดทำไฟล์ประวัตินักศึกษา (PDF)</p>
+        </div>
+
+        <!-- Navigation Tabs with swipe indication on mobile -->
+        <div class="relative bg-slate-50 border-b">
+            <div class="flex overflow-x-auto scrollbar-none">
+                <button type="button" onclick="showTab(1)" id="btn-tab-1" class="tab-btn px-4 py-4 text-xs sm:text-sm font-medium whitespace-nowrap flex-1 text-center hover:bg-slate-100">1. ข้อมูลส่วนตัว</button>
+                <button type="button" onclick="showTab(2)" id="btn-tab-2" class="tab-btn px-4 py-4 text-xs sm:text-sm font-medium whitespace-nowrap flex-1 text-center hover:bg-slate-100">2. สุขภาพ & เอกสาร</button>
+                <button type="button" onclick="showTab(3)" id="btn-tab-3" class="tab-btn px-4 py-4 text-xs sm:text-sm font-medium whitespace-nowrap flex-1 text-center hover:bg-slate-100">3. ครอบครัว</button>
+                <button type="button" onclick="showTab(4)" id="btn-tab-4" class="tab-btn px-4 py-4 text-xs sm:text-sm font-medium whitespace-nowrap flex-1 text-center hover:bg-slate-100">4. ประวัติการศึกษา</button>
+                <button type="button" onclick="showTab(5)" id="btn-tab-5" class="tab-btn px-4 py-4 text-xs sm:text-sm font-medium whitespace-nowrap flex-1 text-center hover:bg-slate-100">5. ประวัติการทำงาน</button>
+                <button type="button" onclick="showTab(6)" id="btn-tab-6" class="tab-btn px-4 py-4 text-xs sm:text-sm font-medium whitespace-nowrap flex-1 text-center hover:bg-slate-100">6. ทัศนคติ & บันทึก</button>
+            </div>
+            <!-- Indicator showing mobile users can scroll -->
+            <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-slate-50/80 to-transparent pointer-events-none sm:hidden"></div>
+        </div>
+
+        <form id="studentForm" class="p-4 sm:p-6 md:p-8 space-y-6">
+            <!-- ========================================== -->
+            <!-- PART 1: PERSONAL INFO -->
+            <!-- ========================================== -->
+            <div id="tab-1" class="tab-content active space-y-6">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-800 border-l-4 border-blue-600 pl-3">ส่วนที่ 1: ข้อมูลส่วนตัวและการสมัคร</h2>
+                    <p class="text-xs text-slate-500 mt-1">ข้อมูลทั่วไปเกี่ยวกับตัวท่านเพื่อเริ่มการรับเข้าศึกษา</p>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">วันที่สมัคร <span class="text-red-500">*</span></label>
+                        <input type="date" name="applyDate" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">ทราบข้อมูลการสมัครจาก</label>
+                        <input type="text" name="applySource" placeholder="เช่น การแนะแนว, เพื่อน, สื่อออนไลน์">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">สำนักงานสาขาที่รับสมัคร</label>
+                        <input type="text" name="applyBranch" placeholder="เช่น เชียงใหม่, กรุงเทพฯ">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 border-t pt-5 border-slate-100">
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">เลขประจำตัวนักศึกษา <span class="text-red-500">*</span></label>
+                        <input type="text" name="studentId" required placeholder="รหัสนักศึกษา">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">วุฒิที่ใช้สมัคร <span class="text-red-500">*</span></label>
+                        <div class="flex flex-wrap gap-3 mt-1.5">
+                            <label class="inline-flex items-center text-sm"><input type="radio" name="applyEduLevel" value="m6" class="mr-1.5 w-4 h-4" required> ม.6</label>
+                            <label class="inline-flex items-center text-sm"><input type="radio" name="applyEduLevel" value="nfe" class="mr-1.5 w-4 h-4"> กศน.</label>
+                            <label class="inline-flex items-center text-sm"><input type="radio" name="applyEduLevel" value="voc" class="mr-1.5 w-4 h-4"> ปวช.</label>
+                            <label class="inline-flex items-center text-sm"><input type="radio" name="applyEduLevel" value="hvoc" class="mr-1.5 w-4 h-4"> ปวส.</label>
+                            <label class="inline-flex items-center text-sm"><input type="radio" name="applyEduLevel" value="uni" class="mr-1.5 w-4 h-4"> ป.ตรี</label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">สาขาวิชาที่สมัคร</label>
+                        <input type="text" name="applyMajor" placeholder="เช่น อิเล็กทรอนิกส์">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 border-t pt-5 border-slate-100">
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">คำนำหน้าชื่อ (ไทย) <span class="text-red-500">*</span></label>
+                        <select name="titleTh" required>
+                            <option value="">เลือกคำนำหน้า</option>
+                            <option value="นาย">นาย</option>
+                            <option value="นางสาว">นางสาว</option>
+                            <option value="นาง">นาง</option>
+                        </select>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">ชื่อ-นามสกุล (ภาษาไทย) <span class="text-red-500">*</span></label>
+                        <input type="text" name="fullNameTh" required placeholder="ชื่อ นามสกุลจริง">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">ชื่อเล่น (ไทย)</label>
+                        <input type="text" name="nicknameTh">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Full Name (English) <span class="text-red-500">*</span></label>
+                        <input type="text" name="fullNameEn" required placeholder="Firstname Lastname">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Nickname (English)</label>
+                        <input type="text" name="nicknameEn">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">วัน/เดือน/ปีเกิด <span class="text-red-500">*</span></label>
+                        <input type="date" name="birthDate" required onchange="calculateAge()">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">อายุ (ปี)</label>
+                        <input type="number" name="ageYears" readonly class="bg-slate-100 cursor-not-allowed">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">อายุ (เดือน)</label>
+                        <input type="number" name="ageMonths" readonly class="bg-slate-100 cursor-not-allowed">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">สถานภาพ <span class="text-red-500">*</span></label>
+                        <select name="maritalStatus" required onchange="toggleChildInput()">
+                            <option value="single">โสด</option>
+                            <option value="married_unreg">แต่งงานไม่จดทะเบียน</option>
+                            <option value="married_reg">แต่งงานจดทะเบียน</option>
+                            <option value="divorced">หย่าร้าง</option>
+                            <option value="has_child">มีบุตร</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="childInputGroup" class="hidden grid grid-cols-1 sm:grid-cols-4 gap-4">
+                    <div class="sm:col-start-4">
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">จำนวนบุตร (คน)</label>
+                        <input type="number" name="childCount" min="0" value="0">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-5 border-slate-100">
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1 font-semibold">ที่อยู่ตามทะเบียนบ้าน <span class="text-red-500">*</span></label>
+                        <textarea name="addressRegister" rows="3" required placeholder="ระบุเลขที่ หมู่ ตำบล อำเภอ จังหวัด รหัสไปรษณีย์"></textarea>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-xs sm:text-sm font-medium text-slate-700 font-semibold">ที่อยู่ปัจจุบัน</label>
+                            <button type="button" onclick="copyAddress()" class="text-xs text-blue-600 hover:text-blue-800 font-medium hover:underline">ใช้ที่อยู่เดียวกับทะเบียนบ้าน</button>
+                        </div>
+                        <textarea name="addressCurrent" rows="3" placeholder="ระบุเลขที่ หมู่ ตำบล อำเภอ จังหวัด รหัสไปรษณีย์"></textarea>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">เบอร์โทรส่วนตัว <span class="text-red-500">*</span></label>
+                        <input type="text" name="phonePersonal" required placeholder="เช่น 0812345678">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Facebook</label>
+                        <input type="text" name="facebook" placeholder="ชื่อเฟซบุ๊ก">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">ID LINE</label>
+                        <input type="text" name="lineId" placeholder="ไลน์ไอดี">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Email <span class="text-red-500">*</span></label>
+                        <input type="text" name="email" required placeholder="example@email.com">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 border-t pt-5 border-slate-100">
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">เบอร์โทรผู้ปกครอง <span class="text-red-500">*</span></label>
+                        <input type="text" name="phoneParent" required placeholder="เบอร์ติดต่อฉุกเฉิน">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">พักอาศัยอยู่กับ</label>
+                        <div class="flex gap-4 mt-2">
+                            <label class="inline-flex items-center text-sm"><input type="radio" name="livingWith" value="parents" checked class="mr-1.5 w-4 h-4" onchange="toggleLivingWithDetails()"> พ่อแม่</label>
+                            <label class="inline-flex items-center text-sm"><input type="radio" name="livingWith" value="other" class="mr-1.5 w-4 h-4" onchange="toggleLivingWithDetails()"> อื่นๆ</label>
+                        </div>
+                    </div>
+                    <div id="livingWithDetailsGroup" class="hidden sm:col-span-2 md:col-span-1">
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">ระบุรายละเอียดที่พัก</label>
+                        <input type="text" name="livingWithOtherDetails" placeholder="ระบุเช่น หอพัก, บ้านญาติ">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">เกี่ยวเนื่องเป็น</label>
+                        <input type="text" name="parentRelationship" placeholder="เช่น มารดา, บิดา, ป้า, พี่ชาย">
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-xl space-y-4 border border-slate-200">
+                    <h3 class="text-sm font-bold text-slate-800">สัดส่วนร่างกาย</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">ส่วนสูง (ซม.)</label>
+                            <input type="number" name="height" placeholder="เช่น 175" onchange="calculateBMI()">
+                        </div>
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">น้ำหนัก (กก.)</label>
+                            <input type="number" name="weight" placeholder="เช่น 65" onchange="calculateBMI()">
+                        </div>
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">ค่า BMI</label>
+                            <input type="text" name="bmi" readonly class="bg-slate-200 cursor-not-allowed">
+                        </div>
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">สัดส่วนจริง</label>
+                            <select name="bodyShape">
+                                <option value="normal">ปกติ</option>
+                                <option value="thin">ผอม</option>
+                                <option value="chubby">อ้วน</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">ถนัดมือ</label>
+                            <select name="handedness">
+                                <option value="right">ขวา</option>
+                                <option value="left">ซ้าย</option>
+                            </select>
+                        </div>
+                        <div class="col-span-2 sm:col-span-1">
+                            <label class="block text-xxs text-slate-500 mb-1">หมายเหตุสัดส่วน</label>
+                            <input type="text" name="bodyNotes" placeholder="เพิ่มเติม">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-xl space-y-4 border border-slate-200">
+                    <h3 class="text-sm font-bold text-slate-800">ข้อมูลสายตาและการช่วยเหลือ</h3>
+                    
+                    <!-- ส่วนระบุค่าสายตา -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4 border-b border-slate-200">
+                        <div>
+                            <span class="block text-xs font-semibold text-slate-700 mb-2">ค่าสายตาตาซ้าย</span>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xxs text-slate-500 mb-1">ค่าสายตา</label>
+                                    <input type="text" name="eyesightLeftVal" placeholder="เช่น 1.2">
+                                </div>
+                                <div>
+                                    <label class="block text-xxs text-slate-500 mb-1">สถานะสายตา</label>
+                                    <select name="eyesightLeftStatus">
+                                        <option value="normal">ปกติ</option>
+                                        <option value="short">สายตาสั้น</option>
+                                        <option value="astigmatism">เอียง</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="block text-xs font-semibold text-slate-700 mb-2">ค่าสายตาตาขวา</span>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xxs text-slate-500 mb-1">ค่าสายตา</label>
+                                    <input type="text" name="eyesightRightVal" placeholder="เช่น 1.2">
+                                </div>
+                                <div>
+                                    <label class="block text-xxs text-slate-500 mb-1">สถานะสายตา</label>
+                                    <select name="eyesightRightStatus">
+                                        <option value="normal">ปกติ</option>
+                                        <option value="short">สายตาสั้น</option>
+                                        <option value="astigmatism">เอียง</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ส่วนระบุการสวมแว่นตา / คอนแทคเลนส์ -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                        <div>
+                            <span class="block text-xs font-semibold text-slate-700 mb-1.5">ใส่แว่นตา / คอนแทคเลนส์ (ตาซ้าย)</span>
+                            <div class="flex gap-4">
+                                <label class="text-xs flex items-center cursor-pointer"><input type="checkbox" name="glassesLeft" class="mr-1.5 w-4.5 h-4.5"> แว่นตา</label>
+                                <label class="text-xs flex items-center cursor-pointer"><input type="checkbox" name="contactsLeft" class="mr-1.5 w-4.5 h-4.5"> คอนแทคเลนส์</label>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="block text-xs font-semibold text-slate-700 mb-1.5">ใส่แว่นตา / คอนแทคเลนส์ (ตาขวา)</span>
+                            <div class="flex gap-4">
+                                <label class="text-xs flex items-center cursor-pointer"><input type="checkbox" name="glassesRight" class="mr-1.5 w-4.5 h-4.5"> แว่นตา</label>
+                                <label class="text-xs flex items-center cursor-pointer"><input type="checkbox" name="contactsRight" class="mr-1.5 w-4.5 h-4.5"> คอนแทคเลนส์</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">ตาบอดสี</label>
+                        <select name="colorBlindness">
+                            <option value="none">ไม่บอดสี</option>
+                            <option value="red_green">ตาบอดสี แดง-เขียว</option>
+                            <option value="blue_yellow">ตาบอดสี น้ำเงิน-เหลือง</option>
+                            <option value="all">ตาบอดสี ทุกสี</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">รอยสัก</label>
+                        <select name="tattoo" onchange="toggleTattooDetails()">
+                            <option value="none">ไม่มีรอยสัก</option>
+                            <option value="has">มีรอยสัก</option>
+                        </select>
+                    </div>
+                    <div id="tattooDetailsGroup" class="hidden sm:col-span-2 grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">จำนวนจุด</label>
+                            <input type="number" name="tattooPoints" value="0">
+                        </div>
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">ขนาด (ซม.)</label>
+                            <input type="text" name="tattooSize" placeholder="เช่น 5x5">
+                        </div>
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">บริเวณที่สัก</label>
+                            <input type="text" name="tattooArea" placeholder="ระบุตำแหน่ง">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-5 border-slate-100">
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">ภาระทางทหาร (เฉพาะชาย)</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <select name="militaryStatus" onchange="toggleMilitaryYear()">
+                                <option value="not_reached">ยังไม่ถึงเกณฑ์</option>
+                                <option value="served">เกณฑ์ทหารแล้ว</option>
+                                <option value="nst">รด. (รักษาดินแดน)</option>
+                                <option value="exempted">ได้รับการยกเว้น/ผ่อนผัน</option>
+                            </select>
+                            <input type="text" id="militaryYear" name="militaryYear" placeholder="ระบุปี เช่น 2569" class="hidden">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">การเปลี่ยนชื่อ-นามสกุล</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <select name="nameChanged" onchange="toggleNameChangeDetails()">
+                                <option value="none">ไม่เคยเปลี่ยน</option>
+                                <option value="has">เคยเปลี่ยน</option>
+                            </select>
+                            <input type="text" id="nameChangedDetails" name="nameChangedReason" placeholder="ชื่อเก่า/สาเหตุที่เปลี่ยน" class="hidden">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- PART 2: HEALTH & PERSONAL DOCUMENTS -->
+            <!-- ========================================== -->
+            <div id="tab-2" class="tab-content space-y-6">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-800 border-l-4 border-blue-600 pl-3">ส่วนที่ 2: ประวัติสุขภาพ, พฤติกรรมเสี่ยง และเอกสาร</h2>
+                    <p class="text-xs text-slate-500 mt-1">ข้อมูลเกี่ยวกับสุขอนามัย เอกสารสิทธิ์ และภาระทางการเงินของท่าน</p>
+                </div>
+
+                <div class="space-y-4">
+                    <span class="block text-xs sm:text-sm font-semibold text-slate-700">ประวัติการเจ็บป่วยในอดีต (ติ๊กหัวข้อที่ท่านเคยมีประวัติ)</span>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2">
+                        <label class="flex items-center p-2.5 bg-slate-50 rounded-lg hover:bg-slate-100 cursor-pointer text-xs sm:text-sm border border-blue-100 font-semibold"><input type="checkbox" name="illness_none" class="mr-2 w-4.5 h-4.5 text-blue-600" onchange="onIllnessNoneChange()"> ไม่เคย</label>
+                        <label class="flex items-center p-2.5 bg-slate-50 rounded-lg hover:bg-slate-100 cursor-pointer text-xs sm:text-sm"><input type="checkbox" name="illness_surgery" class="mr-2 w-4.5 h-4.5" onchange="onOtherIllnessChange()"> เคยผ่าตัด</label>
+                        <label class="flex items-center p-2.5 bg-slate-50 rounded-lg hover:bg-slate-100 cursor-pointer text-xs sm:text-sm"><input type="checkbox" name="illness_accident" class="mr-2 w-4.5 h-4.5" onchange="onOtherIllnessChange()"> อุบัติเหตุหนัก</label>
+                        <label class="flex items-center p-2.5 bg-slate-50 rounded-lg hover:bg-slate-100 cursor-pointer text-xs sm:text-sm"><input type="checkbox" name="illness_fracture" class="mr-2 w-4.5 h-4.5" onchange="onOtherIllnessChange()"> กระดูกหัก</label>
+                        <label class="flex items-center p-2.5 bg-slate-50 rounded-lg hover:bg-slate-100 cursor-pointer text-xs sm:text-sm"><input type="checkbox" name="illness_metal" class="mr-2 w-4.5 h-4.5" onchange="onOtherIllnessChange()"> มีเหล็กดาม</label>
+                        <label class="flex items-center p-2.5 bg-slate-50 rounded-lg hover:bg-slate-100 cursor-pointer text-xs sm:text-sm"><input type="checkbox" name="illness_joint" class="mr-2 w-4.5 h-4.5" onchange="onOtherIllnessChange()"> เจ็บเข่า/ข้อ/หลัง</label>
+                        <label class="flex items-center p-2.5 bg-slate-50 rounded-lg hover:bg-slate-100 cursor-pointer text-xs sm:text-sm"><input type="checkbox" name="illness_other" class="mr-2 w-4.5 h-4.5" onchange="onOtherIllnessChange()"> อื่นๆ</label>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">เจ็บป่วยเมื่อใด (ระบุปี/ช่วงเวลา)</label>
+                            <input type="text" name="illnessTime" placeholder="ระบุช่วงปีเกิดเหตุ">
+                        </div>
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">สาเหตุความเจ็บป่วย</label>
+                            <input type="text" name="illnessCause" placeholder="ระบุสาเหตุ">
+                        </div>
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">อาการที่ยังคงอยู่</label>
+                            <input type="text" name="illnessSymptoms" placeholder="เช่น มีอาการเสียวแปล๊บ หรือ ปกติ">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4 border-t pt-5 border-slate-100">
+                    <span class="block text-xs sm:text-sm font-semibold text-slate-700">โรคประจำตัว (เลือกข้อที่เป็น)</span>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+                        <label class="flex items-center p-2 bg-slate-50 rounded hover:bg-slate-100 cursor-pointer text-xs border border-blue-100 font-semibold"><input type="checkbox" name="disease_none" class="mr-1.5 w-4 h-4 text-blue-600" onchange="onDiseaseNoneChange()"> ไม่มีโรคประจำตัว</label>
+                        <label class="flex items-center p-2 bg-slate-50 rounded hover:bg-slate-100 cursor-pointer text-xs"><input type="checkbox" name="disease_asthma" class="mr-1.5 w-4 h-4" onchange="onOtherDiseaseChange()"> หอบหืด</label>
+                        <label class="flex items-center p-2 bg-slate-50 rounded hover:bg-slate-100 cursor-pointer text-xs"><input type="checkbox" name="disease_depression" class="mr-1.5 w-4 h-4" onchange="onOtherDiseaseChange()"> ภาวะซึมเศร้า</label>
+                        <label class="flex items-center p-2 bg-slate-50 rounded hover:bg-slate-100 cursor-pointer text-xs"><input type="checkbox" name="disease_anemia" class="mr-1.5 w-4 h-4" onchange="onOtherDiseaseChange()"> โรคเลือดจาง</label>
+                        <label class="flex items-center p-2 bg-slate-50 rounded hover:bg-slate-100 cursor-pointer text-xs"><input type="checkbox" name="disease_epilepsy" class="mr-1.5 w-4 h-4" onchange="onOtherDiseaseChange()"> ลมชัก</label>
+                        <label class="flex items-center p-2 bg-slate-50 rounded hover:bg-slate-100 cursor-pointer text-xs"><input type="checkbox" name="disease_anxiety" class="mr-1.5 w-4 h-4" onchange="onOtherDiseaseChange()"> วิตกกังวล</label>
+                        <label class="flex items-center p-2 bg-slate-50 rounded hover:bg-slate-100 cursor-pointer text-xs"><input type="checkbox" name="disease_thalassemia" class="mr-1.5 w-4 h-4" onchange="onOtherDiseaseChange()"> ธาลัสซีเมีย</label>
+                        <label class="flex items-center p-2 bg-slate-50 rounded hover:bg-slate-100 cursor-pointer text-xs"><input type="checkbox" name="disease_hepb" class="mr-1.5 w-4 h-4" onchange="onOtherDiseaseChange()"> ไวรัสตับอักเสบ บี</label>
+                        <label class="flex items-center p-2 bg-slate-50 rounded hover:bg-slate-100 cursor-pointer text-xs"><input type="checkbox" name="disease_thyroid" class="mr-1.5 w-4 h-4" onchange="onOtherDiseaseChange()"> ไทรอยด์</label>
+                        <label class="flex items-center p-2 bg-slate-50 rounded hover:bg-slate-100 cursor-pointer text-xs"><input type="checkbox" name="disease_allergy" class="mr-1.5 w-4 h-4" onchange="onOtherDiseaseChange()"> ภูมิแพ้</label>
+                        <label class="flex items-center p-2 bg-slate-50 rounded hover:bg-slate-100 cursor-pointer text-xs"><input type="checkbox" name="disease_other" class="mr-1.5 w-4 h-4" onchange="onOtherDiseaseChange()"> อื่นๆ</label>
+                    </div>
+                    <div>
+                        <label class="block text-xxs text-slate-500 mb-1">ระบุรายละเอียดโรคประจำตัวหรือยารักษาโรคที่ต้องทานประจำ</label>
+                        <input type="text" name="diseaseDetails" placeholder="ระบุประเภทการรักษารับยาเพิ่มเติม (ถ้ามี)">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4 border-t pt-5 border-slate-100">
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">กรุ๊ปเลือด</label>
+                        <select name="bloodGroup">
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="AB">AB</option>
+                            <option value="O">O</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">การทำศัลยกรรม</label>
+                        <select name="plasticSurgery" onchange="toggleSurgeryDetails()">
+                            <option value="none">ไม่เคยทำ</option>
+                            <option value="has">เคยทำ</option>
+                        </select>
+                    </div>
+                    <div id="surgeryDetailsGroup" class="hidden">
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">ระบุบริเวณศัลยกรรม</label>
+                        <input type="text" name="plasticSurgeryDetails" placeholder="ทำส่วนใดมา">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">การจัดฟัน</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <select name="dentalBraces" onchange="toggleDentalBraces()">
+                                <option value="none">ไม่จัดฟัน</option>
+                                <option value="bracing">จัดฟันอยู่</option>
+                            </select>
+                            <input type="text" id="dentalBracesEnd" name="dentalBracesEnd" placeholder="สิ้นสุดเมื่อ..." class="hidden">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">ตำหนิร่างกาย</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <select name="bodyMark" onchange="toggleBodyMarkDetails()">
+                                <option value="none">ไม่มี</option>
+                                <option value="has">มีตำหนิ</option>
+                            </select>
+                            <input type="text" id="bodyMarkDetails" name="bodyMarkSymptoms" placeholder="บริเวณที่เป็น" class="hidden">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">การปวดประจำเดือน (หญิง)</label>
+                        <select name="periodPain">
+                            <option value="none">ไม่ปวด</option>
+                            <option value="mild">ปวดเล็กน้อย</option>
+                            <option value="severe">ปวดมากจนรบกวนชีวิตประจำวัน</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-red-50/50 rounded-xl space-y-4 border border-red-100">
+                    <h3 class="text-sm font-bold text-red-800">พฤติกรรมการอุปโภค (เครื่องดื่ม สารเสพติด และยาสูบ)</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">สูบบุหรี่มวน</label>
+                            <select name="smoke" onchange="toggleQtyInput('smoke')">
+                                <option value="never">ไม่เคย</option>
+                                <option value="regular">สูบประจำ</option>
+                                <option value="sometimes">บางครั้ง</option>
+                            </select>
+                            <input type="text" name="smokeQty" placeholder="เฉลี่ยวันละกี่มวน" class="hidden mt-2 text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">บุหรี่ไฟฟ้า</label>
+                            <select name="vape" onchange="toggleQtyInput('vape')">
+                                <option value="never">ไม่เคย</option>
+                                <option value="regular">สูบประจำ</option>
+                                <option value="sometimes">บางครั้ง</option>
+                            </select>
+                            <input type="text" name="vapeQty" placeholder="เฉลี่ยวันละกี่ครั้ง" class="hidden mt-2 text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">กัญชา</label>
+                            <select name="cannabis" onchange="toggleQtyInput('cannabis')">
+                                <option value="never">ไม่เคย</option>
+                                <option value="regular">สูบประจำ</option>
+                                <option value="sometimes">บางครั้ง</option>
+                            </select>
+                            <input type="text" name="cannabisQty" placeholder="เฉลี่ยวันละกี่ครั้ง" class="hidden mt-2 text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">น้ำกระท่อม</label>
+                            <select name="kratom" onchange="toggleQtyInput('kratom')">
+                                <option value="never">ไม่ดื่ม</option>
+                                <option value="regular">ดื่มประจำ</option>
+                                <option value="sometimes">บางครั้ง</option>
+                            </select>
+                            <input type="text" name="kratomQty" placeholder="ดื่มกี่วัน/สัปดาห์" class="hidden mt-2 text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">เครื่องดื่มแอลกอฮอล์</label>
+                            <select name="alcohol" onchange="toggleQtyInput('alcohol')">
+                                <option value="never">ไม่ดื่ม</option>
+                                <option value="regular">ดื่มประจำ</option>
+                                <option value="sometimes">บางครั้ง</option>
+                            </select>
+                            <input type="text" name="alcoholQty" placeholder="ดื่มกี่ครั้ง/สัปดาห์" class="hidden mt-2 text-xs">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-xl space-y-4 border border-slate-200">
+                    <h3 class="text-sm font-bold text-slate-700">ประวัติเอกสารสิทธิ์และประวัติเดินทางไปประเทศญี่ปุ่น</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">ใบอนุญาตขับขี่</label>
+                            <select name="driverLicense" onchange="toggleLicenseInputs()">
+                                <option value="none">ไม่มี</option>
+                                <option value="has">มีใบอนุญาต</option>
+                            </select>
+                            <div id="licenseCheckedGroup" class="hidden flex gap-4 mt-3">
+                                <label class="text-xs flex items-center"><input type="checkbox" name="licenseCar" class="mr-1.5 w-4 h-4"> ขับขี่รถยนต์</label>
+                                <label class="text-xs flex items-center"><input type="checkbox" name="licenseMotorcycle" class="mr-1.5 w-4 h-4"> รถจักรยานยนต์</label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">ประวัติการถือพาสปอร์ต</label>
+                            <select name="passport" onchange="togglePassportDetails()">
+                                <option value="none">ไม่มีพาสปอร์ต</option>
+                                <option value="has">เคยมีพาสปอร์ต</option>
+                            </select>
+                            <div id="passportDetailsGroup" class="hidden mt-2 space-y-2">
+                                <input type="text" name="passportReason" placeholder="เหตุผลที่มี" class="text-xs">
+                                <input type="text" name="passportCountry" placeholder="ระบุประเทศ" class="text-xs">
+                                <input type="text" name="passportTime" placeholder="เมื่อใด" class="text-xs">
+                                <input type="text" name="passportExpireYear" placeholder="พาสปอร์ตหมดอายุปี ค.ศ." class="text-xs">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">ประวัติเดินทางไปญี่ปุ่น</label>
+                            <select name="japanVisit" onchange="toggleJapanVisitDetails()">
+                                <option value="none">ไม่เคยเดินทางไป</option>
+                                <option value="has">เคยเดินทางไป</option>
+                            </select>
+                            <div id="japanVisitGroup" class="hidden mt-2 space-y-2">
+                                <input type="text" name="japanVisitReason" placeholder="วัตถุประสงค์การเดินทาง" class="text-xs">
+                                <input type="text" name="japanVisitVisaType" placeholder="ประเภทวีซ่า" class="text-xs">
+                                <input type="text" name="japanVisitTime" placeholder="ช่วงเดือนปีที่เดินทาง" class="text-xs">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-4 border-slate-200">
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">เคยสมัครงานไปญี่ปุ่นกับบริษัทอื่นหรือไม่</label>
+                            <select name="japanApply" onchange="toggleJapanApplyDetails()">
+                                <option value="none">ไม่เคย</option>
+                                <option value="has">เคยสมัคร</option>
+                            </select>
+                            <div id="japanApplyGroup" class="hidden mt-2 space-y-2">
+                                <input type="text" name="japanApplyCompany" placeholder="ระบุบริษัทจัดหางาน" class="text-xs">
+                                <input type="text" name="japanApplyTime" placeholder="ช่วงเวลาที่สมัคร" class="text-xs">
+                                <input type="text" name="japanApplyStep" placeholder="ดำเนินการถึงขั้นตอนไหน" class="text-xs">
+                                <input type="text" name="japanApplyWithdrawReason" placeholder="เหตุผลที่ยกเลิก" class="text-xs">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">เคยต้องคดีความอาญาหรือไม่</label>
+                            <select name="criminalRecord" onchange="toggleCriminalDetails()">
+                                <option value="none">ไม่มีประวัติทางคดี</option>
+                                <option value="has">เคยมีประวัติคดีความ</option>
+                            </select>
+                            <input type="text" id="criminalRecordDetails" name="criminalRecordDetails" placeholder="ระบุข้อหา/ปี พ.ศ. ที่เกิดเรื่อง" class="hidden mt-2 text-xs">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-xl space-y-4 border border-slate-200">
+                    <h3 class="text-sm font-bold text-slate-700">ประวัติภาระหนี้สินทางการเงิน</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="md:border-r border-slate-200 pr-0 md:pr-4 pb-4 md:pb-0">
+                            <label class="block text-xs font-semibold text-slate-650 mb-2">หนี้สินของนักศึกษา</label>
+                            <select name="studentDebt" onchange="toggleDebtDetails('student')">
+                                <option value="none">ไม่มีภาระหนี้สิน</option>
+                                <option value="has">มีภาระหนี้สิน (กยศ. / กรอ.)</option>
+                            </select>
+                            <div id="studentDebtGroup" class="hidden mt-2 space-y-2">
+                                <input type="text" name="studentDebtSource" placeholder="ระบุผู้ให้กู้ยืม เช่น กยศ. ธนาคาร" class="text-xs">
+                                <input type="text" name="studentDebtReason" placeholder="เหตุผลการกู้ยืม" class="text-xs">
+                                <input type="text" name="studentDebtAmount" placeholder="ยอดรวมจำนวนเงินกู้ (บาท)" class="text-xs">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-650 mb-2">หนี้สินของครอบครัว / ผู้ปกครอง</label>
+                            <select name="parentDebt" onchange="toggleDebtDetails('parent')">
+                                <option value="none">ไม่มีภาระหนี้สิน</option>
+                                <option value="has">มีภาระหนี้สินค้างชำระ</option>
+                            </select>
+                            <div id="parentDebtGroup" class="hidden mt-2 space-y-2">
+                                <input type="text" name="parentDebtSource" placeholder="ระบุสถาบันการเงินที่กู้ยืม" class="text-xs">
+                                <input type="text" name="parentDebtReason" placeholder="เหตุผลในการกู้ยืม" class="text-xs">
+                                <input type="text" name="parentDebtAmount" placeholder="ยอดรวมหนี้สินของผู้ปกครอง (บาท)" class="text-xs">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- PART 3: FAMILY DETAILS -->
+            <!-- ========================================== -->
+            <div id="tab-3" class="tab-content space-y-6">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-800 border-l-4 border-blue-600 pl-3">ส่วนที่ 3: ประวัติครอบครัวและคนรู้จักในญี่ปุ่น</h2>
+                    <p class="text-xs text-slate-500 mt-1">กรอกข้อมูลผู้ใกล้ชิดและประวัติครอบครัวสูงสุด 8 ท่าน (บนมือถือจะแสดงเป็นฟอร์มแนวตั้งตามลำดับเพื่อความสะดวก)</p>
+                </div>
+
+                <div class="border border-slate-200 rounded-xl bg-white overflow-hidden shadow-sm">
+                    <table class="w-full text-sm text-left border-collapse block lg:table">
+                        <thead class="bg-slate-50 text-slate-600 uppercase font-semibold text-xs border-b border-slate-200 hidden lg:table-header-group">
+                            <tr>
+                                <th class="p-3 w-12 text-center">ลำดับ</th>
+                                <th class="p-3 min-w-[180px]">ชื่อ-นามสกุล</th>
+                                <th class="p-3 w-36">ความสัมพันธ์</th>
+                                <th class="p-3 w-20">อายุ (ปี)</th>
+                                <th class="p-3 min-w-[140px]">อาชีพ</th>
+                                <th class="p-3 min-w-[180px]">สถานที่ทำงาน/บริษัท</th>
+                                <th class="p-3 w-32">รายได้ต่อเดือน</th>
+                                <th class="p-3 w-32">จังหวัด</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 flex flex-col lg:table-row-group p-2 lg:p-0">
+                            <script>
+                                for(let i=1; i<=8; i++) {
+                                    document.write(`
+                                        <tr class="flex flex-col p-4 mb-4 border border-slate-200 rounded-xl bg-slate-50 lg:table-row lg:p-0 lg:mb-0 lg:border-0 lg:bg-transparent hover:bg-slate-50/50">
+                                            <td class="block lg:table-cell p-2 lg:p-3 text-center font-bold text-slate-700 bg-slate-200/80 lg:bg-transparent rounded-t-lg lg:rounded-none">
+                                                <span class="lg:hidden">สมาชิกครอบครัว ลำดับที่ </span>${i}
+                                            </td>
+                                            <td class="block lg:table-cell p-1.5 lg:p-3">
+                                                <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">ชื่อ-นามสกุล</span>
+                                                <input type="text" name="fam_name_${i}" placeholder="ชื่อ-นามสกุล" class="text-xs">
+                                            </td>
+                                            <td class="block lg:table-cell p-1.5 lg:p-3">
+                                                <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">ความสัมพันธ์</span>
+                                                <select name="fam_rel_${i}" class="text-xs">
+                                                    <option value="">เลือกความสัมพันธ์</option>
+                                                    <option value="บิดา">บิดา</option>
+                                                    <option value="มารดา">มารดา</option>
+                                                    <option value="พี่ชาย">พี่ชาย</option>
+                                                    <option value="พี่สาว">พี่สาว</option>
+                                                    <option value="น้องชาย">น้องชาย</option>
+                                                    <option value="น้องสาว">น้องสาว</option>
+                                                    <option value="ญาติ">ญาติ</option>
+                                                </select>
+                                            </td>
+                                            <td class="block lg:table-cell p-1.5 lg:p-3">
+                                                <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">อายุ (ปี)</span>
+                                                <input type="number" name="fam_age_${i}" placeholder="อายุ" min="0" class="text-xs">
+                                            </td>
+                                            <td class="block lg:table-cell p-1.5 lg:p-3">
+                                                <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">อาชีพ</span>
+                                                <input type="text" name="fam_job_${i}" placeholder="อาชีพ" class="text-xs">
+                                            </td>
+                                            <td class="block lg:table-cell p-1.5 lg:p-3">
+                                                <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">สถานที่ทำงาน / บริษัท</span>
+                                                <input type="text" name="fam_work_${i}" placeholder="บริษัท" class="text-xs">
+                                            </td>
+                                            <td class="block lg:table-cell p-1.5 lg:p-3">
+                                                <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">รายได้ต่อเดือน</span>
+                                                <input type="text" name="fam_inc_${i}" placeholder="รายได้ต่อเดือน" class="text-xs">
+                                            </td>
+                                            <td class="block lg:table-cell p-1.5 lg:p-3">
+                                                <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">จังหวัดที่ทำงาน</span>
+                                                <input type="text" name="fam_prov_${i}" placeholder="จังหวัด" class="text-xs">
+                                            </td>
+                                        </tr>
+                                    `);
+                                }
+                            </script>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-5 border-slate-100">
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">สถานะความสัมพันธ์ครอบครัว <span class="text-red-500">*</span></label>
+                        <select name="familyStatus" required>
+                            <option value="together">บิดามารดาอยู่ร่วมกัน</option>
+                            <option value="divorced_reg">หย่าร้าง (จดทะเบียนสมรสหย่า)</option>
+                            <option value="separated">แยกกันอยู่ (ไม่ได้จดทะเบียนสมรส)</option>
+                            <option value="deceased_father">บิดาเสียชีวิต</option>
+                            <option value="deceased_mother">มารดาเสียชีวิต</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">ปัจจุบันท่านอยู่ในความดูแล/ปกครองของใคร</label>
+                        <input type="text" name="guardian" placeholder="เช่น บิดา, มารดา, ลุง">
+                    </div>
+                </div>
+
+                <div class="p-4 bg-blue-50/50 rounded-xl space-y-4 border border-blue-100">
+                    <h3 class="text-sm font-bold text-slate-800">กรณีท่านมีคนรู้จักหรือญาติพำนักอยู่ที่ประเทศญี่ปุ่น</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">คนรู้จักที่ประเทศญี่ปุ่น</label>
+                            <select name="japanContact" onchange="toggleJapanContact()">
+                                <option value="none">ไม่มีคนรู้จัก</option>
+                                <option value="has">มีคนรู้จัก</option>
+                            </select>
+                        </div>
+                        <div class="japanContactField hidden">
+                            <label class="block text-xxs text-slate-500 mb-1">ชื่อ-นามสกุลคนรู้จัก</label>
+                            <input type="text" name="japanContactName" class="text-xs">
+                        </div>
+                        <div class="japanContactField hidden">
+                            <label class="block text-xxs text-slate-500 mb-1">เพศ</label>
+                            <select name="japanContactGender" class="text-xs">
+                                <option value="male">ชาย</option>
+                                <option value="female">หญิง</option>
+                            </select>
+                        </div>
+                        <div class="japanContactField hidden">
+                            <label class="block text-xxs text-slate-500 mb-1">อายุ (ปี)</label>
+                            <input type="text" name="japanContactAge" class="text-xs">
+                        </div>
+                    </div>
+
+                    <div class="japanContactField hidden grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">ความสัมพันธ์</label>
+                            <input type="text" name="japanContactRelationship" placeholder="เช่น พี่ชาย, เพื่อนสนิท" class="text-xs">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-xxs text-slate-500 mb-1">ที่อยู่ในประเทศญี่ปุ่น</label>
+                            <input type="text" name="japanContactAddress" placeholder="ระบุเมือง/จังหวัดในญี่ปุ่น" class="text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">เบอร์โทรศัพท์ที่ญี่ปุ่น</label>
+                            <input type="text" name="japanContactPhone" class="text-xs">
+                        </div>
+                    </div>
+
+                    <div class="japanContactField hidden grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">พำนักอยู่ที่ญี่ปุ่นมากี่ปีแล้ว</label>
+                            <input type="text" name="japanContactYears" class="text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">Facebook</label>
+                            <input type="text" name="japanContactFacebook" class="text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xxs text-slate-500 mb-1">ประเภทวีซ่า</label>
+                            <input type="text" name="japanContactVisaType" placeholder="เช่น ทำงาน, ท่องเที่ยว" class="text-xs">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- PART 4: EDUCATION HISTORY -->
+            <!-- ========================================== -->
+            <div id="tab-4" class="tab-content space-y-6">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-800 border-l-4 border-blue-600 pl-3">ส่วนที่ 4: ประวัติการศึกษา</h2>
+                    <p class="text-xs text-slate-500 mt-1">กรุณาระบุรายละเอียดประวัติการศึกษาตั้งแต่ระดับมัธยมศึกษาตอนต้น</p>
+                </div>
+
+                <div class="border border-slate-200 rounded-xl bg-white overflow-hidden shadow-sm">
+                    <table class="w-full text-sm text-left border-collapse block lg:table">
+                        <thead class="bg-slate-50 text-slate-600 uppercase font-semibold text-xs border-b border-slate-200 hidden lg:table-header-group">
+                            <tr>
+                                <th class="p-3 min-w-[200px]">ระดับการศึกษา</th>
+                                <th class="p-3 min-w-[220px]">ชื่อสถานศึกษา</th>
+                                <th class="p-3 min-w-[160px]">แผนก/สาขาวิชา</th>
+                                <th class="p-3 min-w-[220px]">เข้าศึกษา (ปีเข้า/วันเริ่ม)</th>
+                                <th class="p-3 min-w-[220px]">สำเร็จการศึกษา (ปีจบ/วันสำเร็จ)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 flex flex-col lg:table-row-group p-2 lg:p-0">
+                            <!-- มัธยมศึกษาตอนต้น -->
+                            <tr class="flex flex-col p-4 mb-4 border border-slate-200 rounded-xl bg-slate-50 lg:table-row lg:p-0 lg:mb-0 lg:border-0 lg:bg-transparent hover:bg-slate-50/50">
+                                <td class="block lg:table-cell p-2 lg:p-3 font-bold text-slate-700 bg-slate-200/80 lg:bg-transparent rounded-t-lg lg:rounded-none">มัธยมศึกษาตอนต้น (ม.3)</td>
+                                <td class="block lg:table-cell p-1.5 lg:p-3">
+                                    <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">ชื่อสถานศึกษา</span>
+                                    <input type="text" name="edu_m3_school" placeholder="ชื่อโรงเรียน">
+                                </td>
+                                <td class="block lg:table-cell p-1.5 lg:p-3">
+                                    <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">แผนก/สาขาวิชา</span>
+                                    <input type="text" name="edu_m3_major" placeholder="ศึกษาทั่วไป">
+                                </td>
+                                <td class="block lg:table-cell p-1.5 lg:p-3">
+                                    <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">เข้าศึกษา (ปีที่เข้า / วันเกิดเหตุ)</span>
+                                    <div class="grid grid-cols-2 gap-2 text-xs">
+                                        <input type="text" name="edu_m3_start_year" placeholder="ปีเข้า (พ.ศ.)">
+                                        <input type="date" name="edu_m3_start_date">
+                                    </div>
+                                </td>
+                                <td class="block lg:table-cell p-1.5 lg:p-3">
+                                    <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">สำเร็จการศึกษา (ปีที่จบ / วันสำเร็จ)</span>
+                                    <div class="grid grid-cols-2 gap-2 text-xs">
+                                        <input type="text" name="edu_m3_end_year" placeholder="ปีจบ (พ.ศ.)">
+                                        <input type="date" name="edu_m3_end_date">
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- ปวช./มัธยมปลาย -->
+                            <tr class="flex flex-col p-4 mb-4 border border-slate-200 rounded-xl bg-slate-50 lg:table-row lg:p-0 lg:mb-0 lg:border-0 lg:bg-transparent hover:bg-slate-50/50">
+                                <td class="block lg:table-cell p-2 lg:p-3 font-bold text-slate-700 bg-slate-200/80 lg:bg-transparent rounded-t-lg lg:rounded-none">มัธยมศึกษาตอนปลาย / ปวช.</td>
+                                <td class="block lg:table-cell p-1.5 lg:p-3">
+                                    <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">ชื่อสถานศึกษา</span>
+                                    <input type="text" name="edu_voc_school" placeholder="ชื่อวิทยาลัย/โรงเรียน">
+                                </td>
+                                <td class="block lg:table-cell p-1.5 lg:p-3">
+                                    <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">แผนก/สาขาวิชา</span>
+                                    <input type="text" name="edu_voc_major" placeholder="สาขา/แผนก">
+                                </td>
+                                <td class="block lg:table-cell p-1.5 lg:p-3">
+                                    <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">เข้าศึกษา (ปีที่เข้า / วันเกิดเหตุ)</span>
+                                    <div class="grid grid-cols-2 gap-2 text-xs">
+                                        <input type="text" name="edu_voc_start_year" placeholder="ปีเข้า (พ.ศ.)">
+                                        <input type="date" name="edu_voc_start_date">
+                                    </div>
+                                </td>
+                                <td class="block lg:table-cell p-1.5 lg:p-3">
+                                    <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">สำเร็จการศึกษา (ปีที่จบ / วันสำเร็จ)</span>
+                                    <div class="grid grid-cols-2 gap-2 text-xs">
+                                        <input type="text" name="edu_voc_end_year" placeholder="ปีจบ (พ.ศ.)">
+                                        <input type="date" name="edu_voc_end_date">
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- ปวส./อนุปริญญา -->
+                            <tr class="flex flex-col p-4 mb-4 border border-slate-200 rounded-xl bg-slate-50 lg:table-row lg:p-0 lg:mb-0 lg:border-0 lg:bg-transparent hover:bg-slate-50/50">
+                                <td class="block lg:table-cell p-2 lg:p-3 font-bold text-slate-700 bg-slate-200/80 lg:bg-transparent rounded-t-lg lg:rounded-none">ปวส. / อนุปริญญา / ทวิภาคี</td>
+                                <td class="block lg:table-cell p-1.5 lg:p-3">
+                                    <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">ชื่อสถานศึกษา</span>
+                                    <input type="text" name="edu_hvoc_school" placeholder="ชื่อวิทยาลัย">
+                                </td>
+                                <td class="block lg:table-cell p-1.5 lg:p-3">
+                                    <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">แผนก/สาขาวิชา</span>
+                                    <input type="text" name="edu_hvoc_major" placeholder="สาขา/แผนก">
+                                </td>
+                                <td class="block lg:table-cell p-1.5 lg:p-3">
+                                    <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">เข้าศึกษา (ปีที่เข้า / วันเกิดเหตุ)</span>
+                                    <div class="grid grid-cols-2 gap-2 text-xs">
+                                        <input type="text" name="edu_hvoc_start_year" placeholder="ปีเข้า (พ.ศ.)">
+                                        <input type="date" name="edu_hvoc_start_date">
+                                    </div>
+                                </td>
+                                <td class="block lg:table-cell p-1.5 lg:p-3">
+                                    <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">สำเร็จการศึกษา (ปีที่จบ / วันสำเร็จ)</span>
+                                    <div class="grid grid-cols-2 gap-2 text-xs">
+                                        <input type="text" name="edu_hvoc_end_year" placeholder="ปีจบ (พ.ศ.)">
+                                        <input type="date" name="edu_hvoc_end_date">
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- ปริญญาตรี -->
+                            <tr class="flex flex-col p-4 mb-4 border border-slate-200 rounded-xl bg-slate-50 lg:table-row lg:p-0 lg:mb-0 lg:border-0 lg:bg-transparent hover:bg-slate-50/50">
+                                <td class="block lg:table-cell p-2 lg:p-3 font-bold text-slate-700 bg-slate-200/80 lg:bg-transparent rounded-t-lg lg:rounded-none">ปริญญาตรี (ถ้ามี)</td>
+                                <td class="block lg:table-cell p-1.5 lg:p-3">
+                                    <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">ชื่อสถานศึกษา</span>
+                                    <input type="text" name="edu_uni_school" placeholder="ชื่อมหาวิทยาลัย">
+                                </td>
+                                <td class="block lg:table-cell p-1.5 lg:p-3">
+                                    <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">แผนก/สาขาวิชา</span>
+                                    <input type="text" name="edu_uni_major" placeholder="คณะ/สาขาวิชา">
+                                </td>
+                                <td class="block lg:table-cell p-1.5 lg:p-3">
+                                    <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">เข้าศึกษา (ปีที่เข้า / วันเกิดเหตุ)</span>
+                                    <div class="grid grid-cols-2 gap-2 text-xs">
+                                        <input type="text" name="edu_uni_start_year" placeholder="ปีเข้า (พ.ศ.)">
+                                        <input type="date" name="edu_uni_start_date">
+                                    </div>
+                                </td>
+                                <td class="block lg:table-cell p-1.5 lg:p-3">
+                                    <span class="block lg:hidden text-xxs font-semibold text-slate-500 mb-1">สำเร็จการศึกษา (ปีที่จบ / วันสำเร็จ)</span>
+                                    <div class="grid grid-cols-2 gap-2 text-xs">
+                                        <input type="text" name="edu_uni_end_year" placeholder="ปีจบ (พ.ศ.)">
+                                        <input type="date" name="edu_uni_end_date">
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-5 border-slate-100">
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">ประวัติการศึกษาหยุดชะงักชั่วคราว (ดรอป/ลาออก)</label>
+                        <select name="eduInterrupted" onchange="toggleEduInterruptedDetails()">
+                            <option value="none">การศึกษาปกติและต่อเนื่องกัน</option>
+                            <option value="drop">เคยดรอปภาคเรียน</option>
+                            <option value="quit">เคยลาออกกลางคันระหว่างศึกษา</option>
+                        </select>
+                    </div>
+                    <div id="eduInterruptedGroup" class="hidden">
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">ระบุรายละเอียด/สาเหตุของการหยุดศึกษา</label>
+                        <textarea name="eduInterruptedDetails" rows="2" placeholder="ระบุเหตุผลในการหยุดเรียนและช่วงเวลา"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- PART 5: WORK EXPERIENCE -->
+            <!-- ========================================== -->
+            <div id="tab-5" class="tab-content space-y-6">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-800 border-l-4 border-blue-600 pl-3">ส่วนที่ 5: ประวัติการทำงานและการฝึกงาน</h2>
+                    <p class="text-xs text-slate-500 mt-1">กรุณาระบุบริษัท/โรงงานที่เคยทำงานหรือฝึกงานมาสูงสุด 9 ลำดับ (กดเลือกหัวข้อด้านล่างเพื่อขยายการกรอก)</p>
+                </div>
+
+                <div class="space-y-4">
+                    <script>
+                        for(let i=1; i<=9; i++) {
+                            document.write(`
+                                <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-slate-50">
+                                    <button type="button" onclick="toggleWorkAccordion(${i})" class="w-full p-4 flex justify-between items-center bg-slate-100 hover:bg-slate-200/70 transition">
+                                        <span class="text-xs sm:text-sm font-bold text-slate-750">ประวัติการทำงาน/ฝึกงาน ลำดับที่ ${i}</span>
+                                        <span id="accordion-arrow-${i}" class="text-slate-500 transform transition-transform text-xs">&#9662;</span>
+                                    </button>
+                                    <div id="work-panel-${i}" class="hidden p-4 sm:p-5 bg-white space-y-4 border-t border-slate-200">
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                                            <div>
+                                                <label class="block text-xxs text-slate-500 mb-1">ชื่อบริษัท / สถานประกอบการ</label>
+                                                <input type="text" name="work_${i}_company" placeholder="ระบุชื่อหน่วยงาน">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xxs text-slate-500 mb-1">จังหวัดที่ทำงาน</label>
+                                                <input type="text" name="work_${i}_province" placeholder="จังหวัด">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xxs text-slate-500 mb-1">ประเภทกิจการ</label>
+                                                <input type="text" name="work_${i}_bizType" placeholder="เช่น โรงงานผลิตอะไหล่รถยนต์">
+                                            </div>
+                                        </div>
+
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                                            <div>
+                                                <label class="block text-xxs text-slate-500 mb-1">ตำแหน่ง / ลักษณะงานที่ทำ</label>
+                                                <input type="text" name="work_${i}_jobDesc" placeholder="ระบุภาระหน้าที่">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xxs text-slate-500 mb-1">เงินเดือน (บาท)</label>
+                                                <input type="text" name="work_${i}_salary" placeholder="ระบุตัวเลข เช่น 15000 หรือ -">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xxs text-slate-500 mb-1">ระยะเวลาทำงาน (เริ่ม-สิ้นสุด)</label>
+                                                <input type="text" name="work_${i}_period" placeholder="เช่น สิงหาคม 2564 - มกราคม 2565">
+                                            </div>
+                                        </div>
+
+                                        <div class="border-t border-slate-100 pt-3">
+                                            <label class="block text-xxs text-slate-500 mb-2">ประเภทงานที่เข้าร่วม</label>
+                                            <div class="flex flex-wrap gap-x-4 gap-y-2 text-xs">
+                                                <label class="inline-flex items-center"><input type="radio" name="work_${i}_type" value="work" class="mr-1.5 w-4 h-4"> ทำงานประจำ</label>
+                                                <label class="inline-flex items-center"><input type="radio" name="work_${i}_type" value="parttime" class="mr-1.5 w-4 h-4"> พาร์ทไทม์</label>
+                                                <label class="inline-flex items-center"><input type="radio" name="work_${i}_type" value="intern_voc" class="mr-1.5 w-4 h-4"> ฝึกงาน ปวช.</label>
+                                                <label class="inline-flex items-center"><input type="radio" name="work_${i}_type" value="intern_hvoc" class="mr-1.5 w-4 h-4"> ฝึกงาน ปวส.</label>
+                                                <label class="inline-flex items-center"><input type="radio" name="work_${i}_type" value="intern_uni" class="mr-1.5 w-4 h-4"> ฝึกงาน ป.ตรี</label>
+                                                <label class="inline-flex items-center"><input type="radio" name="work_${i}_type" value="break" class="mr-1.5 w-4 h-4"> งานช่วงปิดเทอม</label>
+                                                <label class="inline-flex items-center"><input type="radio" name="work_${i}_type" value="other" class="mr-1.5 w-4 h-4"> อื่นๆ</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `);
+                        }
+                    </script>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- PART 6: LIFE GOALS & ADDITIONAL NOTES -->
+            <!-- ========================================== -->
+            <div id="tab-6" class="tab-content space-y-6">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-800 border-l-4 border-blue-600 pl-3">ส่วนที่ 6: เป้าหมายและบันทึกรับรองข้อมูล</h2>
+                    <p class="text-xs text-slate-500 mt-1">ส่วนสุดท้ายสำหรับการตรวจสอบเจตคติและบันทึกใบสมัคร</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">เป้าหมายในชีวิต <span class="text-red-500">*</span></label>
+                        <textarea name="lifeGoal" rows="3" required placeholder="อธิบายเป้าหมายความสำเร็จของท่านในอนาคต"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">สิ่งที่ทำเวลาว่าง / งานอดิเรก</label>
+                        <textarea name="hobbies" rows="3" placeholder="ระบุกิจกรรมที่ชอบทำเวลาว่าง"></textarea>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t pt-5 border-slate-100">
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">ข้อดีของตนเอง <span class="text-red-500">*</span></label>
+                        <textarea name="strengths" rows="3" required placeholder="อธิบายจุดเด่นหรือลักษณะนิสัยที่เป็นประโยชน์"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">ข้อเสียของตนเอง <span class="text-red-500">*</span></label>
+                        <textarea name="weaknesses" rows="3" required placeholder="ข้อที่อยากปรับปรุงแก้ไข"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">ความสามารถพิเศษอื่นๆ</label>
+                        <textarea name="specialSkills" rows="3" placeholder="เช่น ขับรถยนต์/จักรยานยนต์, พิมพ์สัมผัส, ทักษะกีฬา, ซ่อมเครื่องจักร"></textarea>
+                    </div>
+                </div>
+
+                <div class="mt-8 p-5 sm:p-8 bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-dashed border-amber-300 rounded-2xl text-center space-y-4">
+                    <p class="text-xs sm:text-sm text-slate-700 font-medium">ข้าพเจ้าขอรับรองว่าข้อมูลและประวัติที่กรอกทั้งหมดเป็นความจริงทุกประการ</p>
+                    <div class="max-w-xs mx-auto">
+                        <button type="button" onclick="submitForm()" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-6 rounded-full shadow-lg transition duration-200 flex items-center justify-center gap-2 text-sm sm:text-base">
+                            <span>✔ บันทึกประวัติและสร้าง PDF</span>
+                        </button>
+                    </div>
+                    <div id="loading" class="hidden mt-4 text-blue-600 animate-pulse font-bold flex items-center justify-center gap-2 text-xs sm:text-sm">
+                        <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>ระบบกำลังสร้างและประมวลผลไฟล์ PDF ของท่าน โปรดรอสักครู่ (ใช้เวลาประมาณ 10-15 วินาที)...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Control Buttons -->
+            <div class="mt-8 flex justify-between border-t border-slate-100 pt-6">
+                <button type="button" id="prevBtn" onclick="changeTab(-1)" class="invisible bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 px-5 rounded-lg font-medium transition duration-150 text-xs sm:text-sm">ย้อนกลับ</button>
+                <button type="button" id="nextBtn" onclick="changeTab(1)" class="bg-blue-50 hover:bg-blue-100 text-blue-700 py-2.5 px-5 rounded-lg font-semibold transition duration-150 text-xs sm:text-sm">หน้าถัดไป &rarr;</button>
+            </div>
+        </form>
+
+        <!-- Success Result Modal -->
+        <div id="resultModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50 transition duration-300">
+            <div class="bg-white p-6 sm:p-8 rounded-2xl max-w-md w-full text-center shadow-2xl border border-slate-100">
+                <div class="text-green-500 text-5xl sm:text-6xl mb-4 bg-green-50 w-16 sm:w-20 h-16 sm:h-20 rounded-full flex items-center justify-center mx-auto border border-green-200">✔</div>
+                <h3 class="text-xl sm:text-2xl font-bold text-slate-800 mb-2">บันทึกประวัติสำเร็จ!</h3>
+                <p class="text-slate-650 mb-6 text-xs sm:text-sm">ระบบได้ทำการบันทึกข้อมูลใบประวัตินักศึกษาของคุณเรียบร้อยแล้ว ขอบคุณที่ให้ความร่วมมือครับ</p>
+                <button onclick="location.reload()" class="block w-full bg-gradient-to-r from-blue-600 to-indigo-650 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-6 rounded-xl mb-2 transition duration-150 shadow-md text-sm sm:text-base">
+                    ตกลง / ทำรายการใหม่
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 1;
+
+        function showTab(n) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('tab-' + n).classList.add('active');
+            document.getElementById('btn-tab-' + n).classList.add('active');
+            
+            currentTab = n;
+            
+            // ปรับการแสดงผลปุ่มควบคุมหน้า
+            document.getElementById('prevBtn').style.visibility = (n === 1) ? 'hidden' : 'visible';
+            document.getElementById('nextBtn').style.display = (n === 6) ? 'none' : 'block';
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function changeTab(step) {
+            let next = currentTab + step;
+            if (next >= 1 && next <= 6) showTab(next);
+        }
+
+        // การคำนวณอายุและเดือนอัตโนมัติจากวันเดือนปีเกิด
+        function calculateAge() {
+            const birthDateInput = document.querySelector('input[name="birthDate"]').value;
+            if (!birthDateInput) return;
+            
+            const birthDate = new Date(birthDateInput);
+            const today = new Date();
+            
+            let ageYears = today.getFullYear() - birthDate.getFullYear();
+            let ageMonths = today.getMonth() - birthDate.getMonth();
+            
+            if (ageMonths < 0 || (ageMonths === 0 && today.getDate() < birthDate.getDate())) {
+                ageYears--;
+                ageMonths += 12;
+            }
+            
+            document.querySelector('input[name="ageYears"]').value = ageYears;
+            document.querySelector('input[name="ageMonths"]').value = ageMonths;
+        }
+
+        // การคำนวณดัชนีมวลกาย BMI อัตโนมัติ
+        function calculateBMI() {
+            const heightInput = document.querySelector('input[name="height"]').value;
+            const weightInput = document.querySelector('input[name="weight"]').value;
+            
+            if (heightInput && weightInput) {
+                const heightMeters = parseFloat(heightInput) / 100;
+                const weightKg = parseFloat(weightInput);
+                const bmi = weightKg / (heightMeters * heightMeters);
+                document.querySelector('input[name="bmi"]').value = bmi.toFixed(2);
+            }
+        }
+
+        // การคัดลอกที่อยู่ตามทะเบียนบ้านไปยังที่อยู่ปัจจุบัน
+        function copyAddress() {
+            const registerAddress = document.querySelector('textarea[name="addressRegister"]').value;
+            document.querySelector('textarea[name="addressCurrent"]').value = registerAddress;
+        }
+
+        // จัดการซ่อนแสดงช่องกรอกข้อมูลบุตร
+        function toggleChildInput() {
+            const maritalStatusSelect = document.querySelector('select[name="maritalStatus"]').value;
+            const childGroup = document.getElementById('childInputGroup');
+            if (maritalStatusSelect === 'has_child') {
+                childGroup.classList.remove('hidden');
+            } else {
+                childGroup.classList.add('hidden');
+                document.querySelector('input[name="childCount"]').value = 0;
+            }
+        }
+
+        // จัดการซ่อนแสดงช่องระบุรายละเอียดที่พักอื่นๆ
+        function toggleLivingWithDetails() {
+            const livingWithRadio = document.querySelector('input[name="livingWith"]:checked').value;
+            const detailGroup = document.getElementById('livingWithDetailsGroup');
+            if (livingWithRadio === 'other') {
+                detailGroup.classList.remove('hidden');
+            } else {
+                detailGroup.classList.add('hidden');
+                document.querySelector('input[name="livingWithOtherDetails"]').value = '';
+            }
+        }
+
+        // จัดการซ่อนแสดงช่องระบุปีการยกเว้นทหาร
+        function toggleMilitaryYear() {
+            const status = document.querySelector('select[name="militaryStatus"]').value;
+            const yearInput = document.getElementById('militaryYear');
+            if (status === 'served' || status === 'exempted') {
+                yearInput.classList.remove('hidden');
+            } else {
+                yearInput.classList.add('hidden');
+                yearInput.value = '';
+            }
+        }
+
+        // จัดการซ่อนแสดงประวัติเปลี่ยนชื่อ
+        function toggleNameChangeDetails() {
+            const choice = document.querySelector('select[name="nameChanged"]').value;
+            const details = document.getElementById('nameChangedDetails');
+            if (choice === 'has') {
+                details.classList.remove('hidden');
+            } else {
+                details.classList.add('hidden');
+                details.value = '';
+            }
+        }
+
+        // จัดการซ่อนแสดงประวัติตกแต่งรอยสัก
+        function toggleTattooDetails() {
+            const tattooVal = document.querySelector('select[name="tattoo"]').value;
+            const detailsGroup = document.getElementById('tattooDetailsGroup');
+            if (tattooVal === 'has') {
+                detailsGroup.classList.remove('hidden');
+            } else {
+                detailsGroup.classList.add('hidden');
+                document.querySelector('input[name="tattooPoints"]').value = 0;
+                document.querySelector('input[name="tattooSize"]').value = '';
+                document.querySelector('input[name="tattooArea"]').value = '';
+            }
+        }
+
+        // จัดการซ่อนแสดงประวัติศัลยกรรม
+        function toggleSurgeryDetails() {
+            const status = document.querySelector('select[name="plasticSurgery"]').value;
+            const group = document.getElementById('surgeryDetailsGroup');
+            if (status === 'has') {
+                group.classList.remove('hidden');
+            } else {
+                group.classList.add('hidden');
+                document.querySelector('input[name="plasticSurgeryDetails"]').value = '';
+            }
+        }
+
+        // จัดการซ่อนแสดงประวัติจัดฟัน
+        function toggleDentalBraces() {
+            const status = document.querySelector('select[name="dentalBraces"]').value;
+            const endInput = document.getElementById('dentalBracesEnd');
+            if (status === 'bracing') {
+                endInput.classList.remove('hidden');
+            } else {
+                endInput.classList.add('hidden');
+                endInput.value = '';
+            }
+        }
+
+        // จัดการซ่อนแสดงประวัติตำหนิร่างกาย
+        function toggleBodyMarkDetails() {
+            const choice = document.querySelector('select[name="bodyMark"]').value;
+            const input = document.getElementById('bodyMarkDetails');
+            if (choice === 'has') {
+                input.classList.remove('hidden');
+            } else {
+                input.classList.add('hidden');
+                input.value = '';
+            }
+        }
+
+        // จัดการซ่อนแสดงรายละเอียดการขับขี่
+        function toggleLicenseInputs() {
+            const val = document.querySelector('select[name="driverLicense"]').value;
+            const group = document.getElementById('licenseCheckedGroup');
+            if (val === 'has') {
+                group.classList.remove('hidden');
+            } else {
+                group.classList.add('hidden');
+                document.querySelector('input[name="licenseCar"]').checked = false;
+                document.querySelector('input[name="licenseMotorcycle"]').checked = false;
+            }
+        }
+
+        // จัดการประวัติพาสปอร์ต
+        function togglePassportDetails() {
+            const val = document.querySelector('select[name="passport"]').value;
+            const group = document.getElementById('passportDetailsGroup');
+            if (val === 'has') {
+                group.classList.remove('hidden');
+            } else {
+                group.classList.add('hidden');
+                group.querySelectorAll('input').forEach(i => i.value = '');
+            }
+        }
+
+        // จัดการประวัติเที่ยวญี่ปุ่น
+        function toggleJapanVisitDetails() {
+            const val = document.querySelector('select[name="japanVisit"]').value;
+            const group = document.getElementById('japanVisitGroup');
+            if (val === 'has') {
+                group.classList.remove('hidden');
+            } else {
+                group.classList.add('hidden');
+                group.querySelectorAll('input').forEach(i => i.value = '');
+            }
+        }
+
+        // จัดการประวัติสมัครงานญี่ปุ่น
+        function toggleJapanApplyDetails() {
+            const val = document.querySelector('select[name="japanApply"]').value;
+            const group = document.getElementById('japanApplyGroup');
+            if (val === 'has') {
+                group.classList.remove('hidden');
+            } else {
+                group.classList.add('hidden');
+                group.querySelectorAll('input').forEach(i => i.value = '');
+            }
+        }
+
+        // จัดการคดีความอาญา
+        function toggleCriminalDetails() {
+            const val = document.querySelector('select[name="criminalRecord"]').value;
+            const input = document.getElementById('criminalRecordDetails');
+            if (val === 'has') {
+                input.classList.remove('hidden');
+            } else {
+                input.classList.add('hidden');
+                input.value = '';
+            }
+        }
+
+        // จัดการซ่อนแสดงช่องระบุจำนวนครั้ง สูบ/ดื่ม แอลกอฮอล์ บุหรี่ กัญชา
+        // ปรับแก้ชื่อให้ไม่สับสนกับ css class
+        function toggleQtyInput(prefix) {
+            const selectVal = document.querySelector(`select[name="${prefix}"]`).value;
+            const qtyInput = document.querySelector(`input[name="${prefix}Qty"]`);
+            if (selectVal === 'regular' || selectVal === 'sometimes') {
+                qtyInput.classList.remove('hidden');
+            } else {
+                qtyInput.classList.add('hidden');
+                qtyInput.value = '';
+            }
+        }
+
+        // จัดการซ่อนแสดงข้อมูลรายละเอียดหนี้สิน (นักศึกษา / ผู้ปกครอง)
+        function toggleDebtDetails(role) {
+            const val = document.querySelector(`select[name="${role}Debt"]`).value;
+            const group = document.getElementById(`${role}DebtGroup`);
+            if (val === 'has') {
+                group.classList.remove('hidden');
+            } else {
+                group.classList.add('hidden');
+                group.querySelectorAll('input').forEach(i => i.value = '');
+            }
+        }
+
+        // จัดการประวัติคนรู้จักที่ประเทศญี่ปุ่น
+        // ปรับโครงสร้าง loop ให้รองรับ CSS class แทน การใช้ inline style เผื่อความสวยงาม
+        function toggleJapanContact() {
+            const val = document.querySelector('select[name="japanContact"]').value;
+            const fields = document.querySelectorAll('.japanContactField');
+            if (val === 'has') {
+                fields.forEach(el => el.classList.remove('hidden'));
+            } else {
+                fields.forEach(el => {
+                    el.classList.add('hidden');
+                    const input = el.querySelector('input, select');
+                    if (input) input.value = '';
+                });
+            }
+        }
+
+        // จัดการล้างตัวเลือกโรคประจำตัวเมื่อเลือก "ไม่มีโรคประจำตัว"
+        function onDiseaseNoneChange() {
+            const isNoneChecked = document.querySelector('input[name="disease_none"]').checked;
+            if (isNoneChecked) {
+                const diseases = ['asthma', 'depression', 'anemia', 'epilepsy', 'anxiety', 'thalassemia', 'hepb', 'thyroid', 'allergy', 'other'];
+                diseases.forEach(d => {
+                    const el = document.querySelector(`input[name="disease_${d}"]`);
+                    if (el) el.checked = false;
+                });
+            }
+        }
+
+        // จัดการล้างตัวเลือก "ไม่มีโรคประจำตัว" เมื่อเลือกโรคอื่นๆ
+        function onOtherDiseaseChange() {
+            const diseaseNone = document.querySelector('input[name="disease_none"]');
+            if (diseaseNone) {
+                diseaseNone.checked = false;
+            }
+        }
+
+        // จัดการล้างตัวเลือกประวัติการเจ็บป่วยเมื่อเลือก "ไม่เคย"
+        function onIllnessNoneChange() {
+            const isNoneChecked = document.querySelector('input[name="illness_none"]').checked;
+            if (isNoneChecked) {
+                const illnesses = ['surgery', 'accident', 'fracture', 'metal', 'joint', 'other'];
+                illnesses.forEach(i => {
+                    const el = document.querySelector(`input[name="illness_${i}"]`);
+                    if (el) el.checked = false;
+                });
+                // เคลียร์ข้อมูลประกอบ
+                const inputs = ['illnessTime', 'illnessCause', 'illnessSymptoms'];
+                inputs.forEach(inp => {
+                    const el = document.querySelector(`input[name="${inp}"]`);
+                    if (el) el.value = '';
+                });
+            }
+        }
+
+        // จัดการล้างตัวเลือก "ไม่เคย" เมื่อเลือกหัวข้อเจ็บป่วยอื่นๆ
+        function onOtherIllnessChange() {
+            const illnessNone = document.querySelector('input[name="illness_none"]');
+            if (illnessNone) {
+                illnessNone.checked = false;
+            }
+        }
+
+        // จัดการเปิด/ปิด Accordion ของประวัติการทำงาน (1-9)
+        function toggleWorkAccordion(n) {
+            const panel = document.getElementById('work-panel-' + n);
+            const arrow = document.getElementById('accordion-arrow-' + n);
+            const isHidden = panel.classList.contains('hidden');
+            
+            if (isHidden) {
+                panel.classList.remove('hidden');
+                arrow.innerHTML = '&#9652;'; // ชี้ขึ้น
+            } else {
+                panel.classList.add('hidden');
+                arrow.innerHTML = '&#9662;'; // ชี้ลง
+            }
+        }
+
+        // จัดการซ่อนแสดงช่องดรอปการศึกษา
+        function toggleEduInterruptedDetails() {
+            const val = document.querySelector('select[name="eduInterrupted"]').value;
+            const group = document.getElementById('eduInterruptedGroup');
+            if (val === 'drop' || val === 'quit') {
+                group.classList.remove('hidden');
+            } else {
+                group.classList.add('hidden');
+                document.querySelector('textarea[name="eduInterruptedDetails"]').value = '';
+            }
+        }
+
+        // การส่งข้อมูลไปยัง Apps Script Backend
+        function submitForm() {
+            const form = document.getElementById('studentForm');
+            if (!form.checkValidity()) {
+                // เด้งกลับ Tab ที่กรอกข้อมูลไม่ครบถ้วน
+                for(let i=1; i<=6; i++) {
+                    const tab = document.getElementById('tab-' + i);
+                    const invalid = tab.querySelectorAll(':invalid');
+                    if (invalid.length > 0) {
+                        showTab(i);
+                        form.reportValidity();
+                        return;
+                    }
+                }
+                form.reportValidity();
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            loading.classList.remove('hidden');
+
+            const formData = {};
+            const inputs = form.querySelectorAll('input, select, textarea');
+            
+            inputs.forEach(input => {
+                if (input.type === 'radio') {
+                    if (input.checked) formData[input.name] = input.value;
+                } else if (input.type === 'checkbox') {
+                    formData[input.name] = input.checked;
+                } else {
+                    formData[input.name] = input.value;
+                }
+            });
+
+            google.script.run
+                .withSuccessHandler(response => {
+                    loading.classList.add('hidden');
+                    if (response.success) {
+                        document.getElementById('resultModal').classList.remove('hidden');
+                        document.getElementById('resultModal').classList.add('flex');
+                    } else {
+                        alert('เกิดข้อผิดพลาดในการประมวลผล: ' + response.message);
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    }
+                })
+                .withFailureHandler(error => {
+                    loading.classList.add('hidden');
+                    alert('เกิดข้อผิดพลาดในการส่งข้อมูล: ' + error);
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                })
+                .processForm(formData);
+        }
+
+        // นำทางไปยังระบบ Admin
+        function goToAdmin() {
+            const btn = document.querySelector('button[onclick="goToAdmin()"]');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = 'กำลังเปลี่ยนหน้า...';
+            }
+            google.script.run.withSuccessHandler(url => {
+                window.open(url + "?mode=admin", "_top");
+            }).getScriptURL();
+        }
+        
+        // ตั้งค่า Active Tab เริ่มต้น
+        showTab(1);
+    </script>
+</body>
+</html>

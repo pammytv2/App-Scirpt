@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจัดการข้อมูลนักศึกษา (Admin)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            background-color: #f1f5f9;
+            min-height: 100vh;
+        }
+        .modal { transition: opacity 0.25s ease; }
+        .scrollbar-none::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-slate-100 flex flex-col min-height-screen">
+    <!-- Login Backdrop Overlay -->
+    <div id="loginBackdrop" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 sm:p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl border border-slate-150 space-y-4">
+            <div class="bg-blue-50 p-4 rounded-full text-blue-600 w-16 h-16 flex items-center justify-center mx-auto border border-blue-200">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold text-slate-800">ระบบจัดการสำหรับผู้ดูแล</h3>
+                <p class="text-xs text-slate-500 mt-1">กรุณาระบุรหัสผ่านเพื่อเข้าถึงฐานข้อมูลประวัตินักศึกษา</p>
+            </div>
+            <div>
+                <input type="password" id="adminPasswordInput" placeholder="กรอกรหัสผ่าน" class="w-full text-center py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition text-sm">
+            </div>
+            <button onclick="checkPassword()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition shadow-md">
+                เข้าสู่ระบบ (Login)
+            </button>
+            <button onclick="goToForm()" class="text-xs text-slate-405 hover:text-slate-600 underline block mx-auto transition">กลับหน้าแรก (ฟอร์มนักศึกษา)</button>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="bg-gradient-to-r from-slate-800 to-slate-900 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="bg-blue-600 p-2 rounded-lg text-white font-bold text-lg tracking-wider shadow">AIU</div>
+                    <span class="font-bold text-lg tracking-wide hidden sm:inline-block">ระบบจัดการข้อมูลประวัตินักศึกษา (Admin Panel)</span>
+                    <span class="font-bold text-sm tracking-wide sm:hidden">AIU Admin</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <button onclick="createMockData()" class="bg-amber-600 hover:bg-amber-500 text-white font-medium py-2 px-3 sm:px-4 rounded-lg text-sm transition flex items-center gap-1.5 shadow">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        สร้างข้อมูลจำลอง
+                    </button>
+                    <button onclick="goToForm()" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-3 sm:px-4 rounded-lg text-sm transition flex items-center gap-1.5 shadow">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        ฟอร์มกรอกประวัติ
+                    </button>
+                    <button onclick="loadData()" class="bg-slate-700 hover:bg-slate-600 text-white font-medium py-2 px-3 sm:px-4 rounded-lg text-sm transition flex items-center gap-1.5 shadow">
+                        <svg class="w-4 h-4 animate-spin-hover" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.248 10h-2.148"></path></svg>
+                        รีเฟรชข้อมูล
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+        <!-- Stats Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                <div class="bg-blue-50 p-4 rounded-xl text-blue-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-500 font-semibold uppercase tracking-wide">จำนวนนักศึกษาทั้งหมด</span>
+                    <span id="totalStudents" class="text-2xl font-bold text-slate-800">0</span>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                <div class="bg-emerald-50 p-4 rounded-xl text-emerald-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-500 font-semibold uppercase tracking-wide">สร้าง PDF สำเร็จแล้ว</span>
+                    <span id="totalPDFs" class="text-2xl font-bold text-slate-800">0</span>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                <div class="bg-amber-50 p-4 rounded-xl text-amber-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-500 font-semibold uppercase tracking-wide">สมัครล่าสุดวันนี้</span>
+                    <span id="todaySubmissions" class="text-2xl font-bold text-slate-800">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter & Search Bar -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div class="relative w-full md:max-w-md">
+                <input type="text" id="searchBar" onkeyup="filterStudents()" placeholder="ค้นหาด้วยรหัส, ชื่อ-นามสกุล, สาขาวิชา..." class="w-full pl-10 pr-4 py-2 border border-slate-350 rounded-xl focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition text-sm">
+                <div class="absolute left-3 top-2.5 text-slate-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+            </div>
+            <div class="flex gap-3 w-full md:w-auto">
+                <select id="eduFilter" onchange="filterStudents()" class="w-full md:w-44 py-2 px-3 border border-slate-350 rounded-xl focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition text-sm bg-white">
+                    <option value="">ระดับการศึกษาทั้งหมด</option>
+                    <option value="m6">ม.6</option>
+                    <option value="nfe">กศน.</option>
+                    <option value="voc">ปวช.</option>
+                    <option value="hvoc">ปวส.</option>
+                    <option value="uni">ป.ตรี</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Data List Card -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left border-collapse">
+                    <thead class="bg-slate-50 text-slate-600 uppercase font-semibold text-xs border-b border-slate-200">
+                        <tr>
+                            <th class="p-4 w-28">วันที่สมัคร</th>
+                            <th class="p-4 w-32">รหัสประจำตัว</th>
+                            <th class="p-4">ชื่อ-นามสกุล (ไทย)</th>
+                            <th class="p-4 w-32 text-center">วุฒิที่ใช้สมัคร</th>
+                            <th class="p-4 w-44">สาขาวิชา</th>
+                            <th class="p-4 w-60 text-center">การดำเนินการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentTableBody" class="divide-y divide-slate-100">
+                        <tr>
+                            <td colspan="6" class="p-8 text-center text-slate-500 font-medium">
+                                <div class="flex flex-col items-center gap-3">
+                                    <svg class="w-8 h-8 animate-spin text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.248 10h-2.148"></path></svg>
+                                    <span>กำลังดึงข้อมูลนักศึกษา โปรดรอสักครู่...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Detailed Modal (View Info Dialog) -->
+    <div id="detailsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[85vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden">
+            <!-- Modal Header -->
+            <div class="bg-slate-800 text-white p-5 flex justify-between items-center">
+                <div>
+                    <h3 class="text-lg font-bold" id="modalStudentTitle">ข้อมูลประวัตินักศึกษาอย่างละเอียด</h3>
+                    <p class="text-xs text-slate-300 mt-1" id="modalStudentSubtitle">แสดงข้อมูลประวัติทั้งหมดที่บันทึกเข้าระบบ</p>
+                </div>
+                <button onclick="closeDetailsModal()" class="text-slate-400 hover:text-white transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <!-- Modal Body (Scrollable layout) -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-6" id="modalContent">
+                <!-- ข้อมูลจะถูกใส่แบบไดนามิกผ่าน Javascript -->
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-end gap-3">
+                <button onclick="closeDetailsModal()" class="bg-slate-200 hover:bg-slate-350 text-slate-700 font-semibold py-2 px-5 rounded-lg text-sm transition">ปิดหน้าต่าง</button>
+                <a id="modalPdfBtn" href="#" target="_blank" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-5 rounded-lg text-sm transition flex items-center gap-1.5 shadow">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    เปิดพิมพ์ PDF
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spinner Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-2xl text-center space-y-3 shadow-xl max-w-xs">
+            <svg class="w-10 h-10 animate-spin text-blue-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.248 10h-2.148"></path></svg>
+            <p class="text-sm font-bold text-slate-800" id="loadingText">กำลังดำเนินการสร้าง PDF ใหม่...</p>
+        </div>
+    </div>
+
+    <script>
+        let allStudents = [];
+        let adminPassword = '';
+
+        // ทำการค้างหน้าล็อกอินและให้แอดมินกรอกรหัสผ่านก่อนเข้าดึงข้อมูล
+        window.onload = function() {
+            const input = document.getElementById('adminPasswordInput');
+            if (input) {
+                input.focus();
+                input.addEventListener("keyup", function(event) {
+                    if (event.key === "Enter") {
+                        checkPassword();
+                    }
+                });
+            }
+        };
+
+        // ฟังก์ชันตรวจสอบรหัสผ่าน
+        function checkPassword() {
+            const pwdInput = document.getElementById('adminPasswordInput');
+            const pwd = pwdInput.value.trim();
+            
+            if (!pwd) {
+                alert('กรุณากรอกรหัสผ่าน');
+                pwdInput.focus();
+                return;
+            }
+            
+            google.script.run
+                .withSuccessHandler(res => {
+                    const isValid = (res && typeof res === 'object') ? res.success : res;
+                    if (isValid) {
+                        adminPassword = pwd;
+                        document.getElementById('loginBackdrop').classList.add('hidden');
+                        loadData();
+                        if (typeof res === 'object' && res.debugInfo) {
+                            console.log("Server Debug Info:", res.debugInfo);
+                        }
+                    } else {
+                        alert('รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง');
+                        pwdInput.value = '';
+                        pwdInput.focus();
+                    }
+                })
+                .withFailureHandler(err => {
+                    alert('เกิดข้อผิดพลาดในการตรวจสอบ: ' + err);
+                })
+                .verifyAdminPassword(pwd);
+        }
+
+        // ดึงข้อมูลทั้งหมดผ่าน backend (ต้องส่งรหัสผ่านเพื่อความปลอดภัย)
+        function loadData() {
+            document.getElementById('studentTableBody').innerHTML = `
+                <tr>
+                    <td colspan="6" class="p-8 text-center text-slate-500 font-medium">
+                        <div class="flex flex-col items-center gap-3">
+                            <svg class="w-8 h-8 animate-spin text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.248 10h-2.148"></path></svg>
+                            <span>กำลังเชื่อมโยงข้อมูล โปรดรอสักครู่...</span>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            
+            google.script.run
+                .withSuccessHandler(data => {
+                    allStudents = data;
+                    renderTable(data);
+                    renderStats(data);
+                })
+                .withFailureHandler(error => {
+                    alert('ไม่สามารถดาวน์โหลดข้อมูลได้: ' + error);
+                })
+                .getStudentSubmissions(adminPassword);
+        }
+
+        // ประมวลผลและแสดงสถิติภาพรวม
+        function renderStats(data) {
+            document.getElementById('totalStudents').innerText = data.length;
+            const pdfCount = data.filter(s => s.pdfUrl).length;
+            document.getElementById('totalPDFs').innerText = pdfCount;
+            
+            // สถิติสำหรับวันนี้
+            const todayStr = new Date().toDateString();
+            const todayCount = data.filter(s => {
+                if(!s.Timestamp) return false;
+                const d = new Date(s.Timestamp);
+                return d.toDateString() === todayStr;
+            }).length;
+            document.getElementById('todaySubmissions').innerText = todayCount;
+        }
+
+        // จัดการแสดงตาราง
+        function renderTable(data) {
+            const tableBody = document.getElementById('studentTableBody');
+            
+            if (data.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="p-8 text-center text-slate-500 font-medium">
+                            ไม่พบข้อมูลประวัตินักศึกษาที่ลงทะเบียนไว้ในระบบ
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            data.forEach(student => {
+                // จัดรูปแบบวันที่สมัคร
+                let formattedDate = '-';
+                if (student.Timestamp) {
+                    const dateObj = new Date(student.Timestamp);
+                    formattedDate = dateObj.toLocaleDateString('th-TH', {day: 'numeric', month: 'short', year: '2-digit'});
+                }
+                
+                const qualificationMap = {
+                    'm6': 'ม.6',
+                    'nfe': 'กศน.',
+                    'voc': 'ปวช.',
+                    'hvoc': 'ปวส.',
+                    'uni': 'ป.ตรี'
+                };
+                const qual = qualificationMap[student.applyEduLevel] || student.applyEduLevel || '-';
+                const pdfBtn = student.pdfUrl 
+                    ? `<a href="${student.pdfUrl}" target="_blank" class="bg-green-50 hover:bg-green-100 text-green-700 py-1.5 px-3 rounded-lg border border-green-200 transition text-xs font-semibold flex items-center gap-1">
+                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> PDF
+                       </a>` 
+                    : `<button onclick="regeneratePDF('${student.studentId}')" class="bg-amber-50 hover:bg-amber-100 text-amber-700 py-1.5 px-3 rounded-lg border border-amber-200 transition text-xs font-semibold flex items-center gap-1">
+                         สร้าง PDF
+                       </button>`;
+
+                html += `
+                    <tr class="hover:bg-slate-50/50">
+                        <td class="p-4 text-slate-500 font-medium">${formattedDate}</td>
+                        <td class="p-4 font-bold text-slate-700">${student.studentId}</td>
+                        <td class="p-4 font-medium text-slate-800">${student.titleTh || ''}${student.fullNameTh || '-'} ${student.nicknameTh ? '('+student.nicknameTh+')' : ''}</td>
+                        <td class="p-4 text-center"><span class="bg-blue-50 text-blue-700 text-xs px-2.5 py-1 rounded-full font-semibold border border-blue-150">${qual}</span></td>
+                        <td class="p-4 text-slate-600 font-medium">${student.applyMajor || '-'}</td>
+                        <td class="p-4">
+                            <div class="flex gap-2 justify-center">
+                                <button onclick="viewDetails('${student.studentId}')" class="bg-blue-50 hover:bg-blue-100 text-blue-700 py-1.5 px-3 rounded-lg border border-blue-200 transition text-xs font-semibold flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                    ดูข้อมูล
+                                </button>
+                                ${pdfBtn}
+                                <button onclick="regeneratePDF('${student.studentId}')" title="สร้าง PDF ใหม่ทับไฟล์เดิม" class="bg-slate-100 hover:bg-slate-200 text-slate-600 py-1.5 px-2 rounded-lg border border-slate-200 transition text-xs">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.248 10h-2.148"></path></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            tableBody.innerHTML = html;
+        }
+
+        // ค้นหาและคัดกรองข้อมูลในตาราง
+        function filterStudents() {
+            const query = document.getElementById('searchBar').value.toLowerCase();
+            const eduVal = document.getElementById('eduFilter').value;
+            
+            const filtered = allStudents.filter(student => {
+                const id = (student.studentId || '').toString().toLowerCase();
+                const name = (student.fullNameTh || '').toLowerCase();
+                const major = (student.applyMajor || '').toLowerCase();
+                const level = student.applyEduLevel || '';
+                
+                const matchQuery = id.includes(query) || name.includes(query) || major.includes(query);
+                const matchEdu = eduVal === '' || level === eduVal;
+                
+                return matchQuery && matchEdu;
+            });
+            
+            renderTable(filtered);
+        }
+
+        // แสดงกล่องดีเทลข้อมูลประวัติอย่างละเอียด
+        function viewDetails(studentId) {
+            const student = allStudents.find(s => s.studentId.toString() === studentId.toString());
+            if(!student) return;
+
+            document.getElementById('modalStudentTitle').innerText = `${student.titleTh || ''}${student.fullNameTh || ''} (รหัสประจำตัว: ${student.studentId})`;
+            document.getElementById('modalStudentSubtitle').innerText = `รายละเอียดประวัติทั้งหมด ณ วันที่สมัคร ${student.applyDate || '-'}`;
+            
+            // ตั้งค่าปุ่มพิมพ์ PDF ใน Modal
+            const pdfBtn = document.getElementById('modalPdfBtn');
+            if (student.pdfUrl) {
+                pdfBtn.href = student.pdfUrl;
+                pdfBtn.removeAttribute('onclick');
+                pdfBtn.innerHTML = `
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    เปิดพิมพ์ PDF
+                `;
+                pdfBtn.className = "bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-5 rounded-lg text-sm transition flex items-center gap-1.5 shadow";
+            } else {
+                pdfBtn.href = "#";
+                pdfBtn.setAttribute('onclick', `event.preventDefault(); closeDetailsModal(); regeneratePDF('${student.studentId}');`);
+                pdfBtn.innerHTML = `
+                    <svg class="w-4 h-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    สร้าง PDF
+                `;
+                pdfBtn.className = "bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-5 rounded-lg text-sm transition flex items-center gap-1.5 shadow";
+            }
+
+            // จัดกลุ่มและดึงข้อมูลเพื่อโชว์ใน Dialog
+            // จัดสร้าง HTML แยกตามแท็บ
+            let contentHtml = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- ส่วนที่ 1: ข้อมูลส่วนตัวและการสมัคร -->
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-3">
+                        <h4 class="font-bold text-slate-800 border-b pb-2 flex items-center gap-1.5 text-sm uppercase">
+                            <span class="text-blue-600">Part 1:</span> ข้อมูลส่วนตัว
+                        </h4>
+                        <div class="grid grid-cols-2 gap-y-2 text-xs">
+                            <span class="text-slate-500">สาขาที่สมัคร:</span> <span class="font-semibold text-slate-800">${student.applyMajor || '-'} (${student.applyBranch || '-'})</span>
+                            <span class="text-slate-500">ชื่อเล่น (ไทย/Eng):</span> <span class="font-semibold text-slate-800">${student.nicknameTh || '-'} / ${student.nicknameEn || '-'}</span>
+                            <span class="text-slate-500">ชื่ออังกฤษ:</span> <span class="font-semibold text-slate-800 col-span-1">${student.fullNameEn || '-'}</span>
+                            <span class="text-slate-500">เกิดวันที่:</span> <span class="font-semibold text-slate-800">${student.birthDate || '-'}</span>
+                            <span class="text-slate-500">อายุ:</span> <span class="font-semibold text-slate-800">${student.ageYears || 0} ปี ${student.ageMonths || 0} เดือน</span>
+                            <span class="text-slate-500">สถานภาพ:</span> <span class="font-semibold text-slate-800">${student.maritalStatus || '-'} (บุตร: ${student.childCount || 0} คน)</span>
+                            <span class="text-slate-500">เบอร์ส่วนตัว:</span> <span class="font-semibold text-slate-800">${student.phonePersonal || '-'}</span>
+                            <span class="text-slate-500">Line ID / Email:</span> <span class="font-semibold text-slate-800 text-xxs truncate">${student.lineId || '-'} / ${student.email || '-'}</span>
+                            <span class="text-slate-500">Facebook:</span> <span class="font-semibold text-slate-800">${student.facebook || '-'}</span>
+                            <span class="text-slate-500">ส่วนสูง / น้ำหนัก:</span> <span class="font-semibold text-slate-800">${student.height || '-'} ซม. / ${student.weight || '-'} กก. (BMI: ${student.bmi || '-'})</span>
+                            <span class="text-slate-500">ถนัดมือ / ตาบอดสี:</span> <span class="font-semibold text-slate-800">${student.handedness || 'ขวา'} / ${student.colorBlindness || 'ไม่มี'}</span>
+                            <span class="text-slate-500">ทหาร / เปลี่ยนชื่อ:</span> <span class="font-semibold text-slate-800">${student.militaryStatus || '-'} / ${student.nameChanged || 'ไม่เคย'}</span>
+                        </div>
+                        <div class="text-xs pt-2 border-t space-y-1">
+                            <p class="text-slate-500 font-medium">ที่อยู่ตามทะเบียนบ้าน:</p>
+                            <p class="font-semibold text-slate-800 bg-white p-2 rounded border">${student.addressRegister || '-'}</p>
+                            <p class="text-slate-500 font-medium pt-1">ที่อยู่ปัจจุบัน:</p>
+                            <p class="font-semibold text-slate-800 bg-white p-2 rounded border">${student.addressCurrent || '-'}</p>
+                        </div>
+                    </div>
+
+                    <!-- ส่วนที่ 2: สุขภาพและเอกสารส่วนตัว -->
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-3">
+                        <h4 class="font-bold text-slate-800 border-b pb-2 flex items-center gap-1.5 text-sm uppercase">
+                            <span class="text-blue-600">Part 2:</span> สุขภาพ & เอกสารสิทธิ์
+                        </h4>
+                        <div class="grid grid-cols-2 gap-y-2 text-xs">
+                            <span class="text-slate-500">ประวัติการผ่าตัด:</span> <span class="font-semibold text-slate-800">${student.illness_surgery === 'ใช่' || student.illness_surgery === true ? 'เคย' : 'ไม่เคย'}</span>
+                            <span class="text-slate-500">อุบัติเหตุหนัก:</span> <span class="font-semibold text-slate-800">${student.illness_accident === 'ใช่' || student.illness_accident === true ? 'เคย' : 'ไม่เคย'}</span>
+                            <span class="text-slate-500">กระดูกหัก/มีเหล็กดาม:</span> <span class="font-semibold text-slate-800">${student.illness_fracture === 'ใช่' || student.illness_metal === 'ใช่' ? 'เคย' : 'ไม่เคย'}</span>
+                            <span class="text-slate-500">โรคประจำตัวเด่น:</span> <span class="font-semibold text-slate-800">${student.diseaseDetails || 'ไม่มี'}</span>
+                            <span class="text-slate-500">กรุ๊ปเลือด:</span> <span class="font-semibold text-slate-800 font-bold text-blue-700">${student.bloodGroup || '-'}</span>
+                            <span class="text-slate-500">ศัลยกรรม / จัดฟัน:</span> <span class="font-semibold text-slate-800">${student.plasticSurgery || 'ไม่เคย'} / ${student.dentalBraces || 'ไม่'}</span>
+                            <span class="text-slate-500">สูบบุหรี่ / บุหรี่ไฟฟ้า:</span> <span class="font-semibold text-slate-800">${student.smoke || 'ไม่'} / ${student.vape || 'ไม่'}</span>
+                            <span class="text-slate-500">กระท่อม / แอลกอฮอล์:</span> <span class="font-semibold text-slate-800">${student.kratom || 'ไม่'} / ${student.alcohol || 'ไม่'}</span>
+                            <span class="text-slate-500">ใบขับขี่:</span> <span class="font-semibold text-slate-800">${student.driverLicense || 'ไม่มี'} (รถยนต์: ${student.licenseCar || 'ไม่'}, มอไซค์: ${student.licenseMotorcycle || 'ไม่'})</span>
+                            <span class="text-slate-500">พาสปอร์ต / ไปญี่ปุ่น:</span> <span class="font-semibold text-slate-800">${student.passport || 'ไม่มี'} / ${student.japanVisit || 'ไม่เคย'}</span>
+                            <span class="text-slate-500">คดีอาญา:</span> <span class="font-semibold text-slate-800 text-red-600">${student.criminalRecord || 'ไม่มี'}</span>
+                        </div>
+                        <div class="text-xs pt-2 border-t space-y-1">
+                            <p class="text-slate-500 font-medium">ภาระหนี้สินนักศึกษา (กยศ./กรอ.):</p>
+                            <p class="font-semibold text-slate-800 bg-white p-2 rounded border">${student.studentDebt === 'ใช่' || student.studentDebt === true ? student.studentDebtSource+' ยอด: '+student.studentDebtAmount+' บาท' : 'ไม่มี'}</p>
+                            <p class="text-slate-500 font-medium pt-1">หนี้สินของครอบครัว:</p>
+                            <p class="font-semibold text-slate-800 bg-white p-2 rounded border">${student.parentDebt === 'ใช่' || student.parentDebt === true ? student.parentDebtSource+' ยอด: '+student.parentDebtAmount+' บาท' : 'ไม่มี'}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-6">
+                    <!-- ส่วนที่ 3: ตารางรายชื่อประวัติครอบครัว -->
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-3">
+                        <h4 class="font-bold text-slate-800 border-b pb-2 flex items-center gap-1.5 text-sm uppercase">
+                            <span class="text-blue-600">Part 3:</span> ประวัติครอบครัว (8 แถว)
+                        </h4>
+                        <div class="overflow-x-auto border rounded bg-white">
+                            <table class="w-full text-xxs text-left border-collapse">
+                                <thead class="bg-slate-100 text-slate-600 font-bold border-b">
+                                    <tr>
+                                        <th class="p-2 text-center w-8">#</th>
+                                        <th class="p-2">ชื่อ-นามสกุล</th>
+                                        <th class="p-2 w-20">ความสัมพันธ์</th>
+                                        <th class="p-2 w-12">อายุ</th>
+                                        <th class="p-2">อาชีพ</th>
+                                        <th class="p-2">สถานที่ทำงาน</th>
+                                        <th class="p-2 w-20">รายได้/เดือน</th>
+                                        <th class="p-2 w-20">จังหวัด</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    ${renderFamilyRows(student)}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-xs pt-2">
+                            <div><span class="text-slate-500">สถานภาพความสัมพันธ์พ่อแม่:</span> <span class="font-semibold text-slate-800">${student.familyStatus || '-'}</span></div>
+                            <div><span class="text-slate-500">ผู้ดูแลปัจจุบัน:</span> <span class="font-semibold text-slate-800">${student.guardian || '-'}</span></div>
+                        </div>
+                    </div>
+
+                    <!-- ส่วนที่ 4: ประวัติการศึกษาและการหยุดเรียน -->
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-3">
+                        <h4 class="font-bold text-slate-800 border-b pb-2 flex items-center gap-1.5 text-sm uppercase">
+                            <span class="text-blue-600">Part 4:</span> ประวัติการศึกษา
+                        </h4>
+                        <div class="overflow-x-auto border rounded bg-white">
+                            <table class="w-full text-xxs text-left border-collapse">
+                                <thead class="bg-slate-100 text-slate-600 font-bold border-b">
+                                    <tr>
+                                        <th class="p-2">ระดับการศึกษา</th>
+                                        <th class="p-2">ชื่อสถานศึกษา</th>
+                                        <th class="p-2">สาขาวิชา/แผนก</th>
+                                        <th class="p-2">ปีเข้า / วันเริ่ม</th>
+                                        <th class="p-2">ปีจบ / วันสำเร็จ</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    <tr>
+                                        <td class="p-2 font-bold">ม.3</td>
+                                        <td class="p-2">${student.edu_m3_school || '-'}</td>
+                                        <td class="p-2">${student.edu_m3_major || '-'}</td>
+                                        <td class="p-2">${student.edu_m3_start_year || '-'} (${student.edu_m3_start_date || '-'})</td>
+                                        <td class="p-2">${student.edu_m3_end_year || '-'} (${student.edu_m3_end_date || '-'})</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2 font-bold">ม.ปลาย / ปวช.</td>
+                                        <td class="p-2">${student.edu_voc_school || '-'}</td>
+                                        <td class="p-2">${student.edu_voc_major || '-'}</td>
+                                        <td class="p-2">${student.edu_voc_start_year || '-'} (${student.edu_voc_start_date || '-'})</td>
+                                        <td class="p-2">${student.edu_voc_end_year || '-'} (${student.edu_voc_end_date || '-'})</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2 font-bold">ปวส. / ทวิภาคี</td>
+                                        <td class="p-2">${student.edu_hvoc_school || '-'}</td>
+                                        <td class="p-2">${student.edu_hvoc_major || '-'}</td>
+                                        <td class="p-2">${student.edu_hvoc_start_year || '-'} (${student.edu_hvoc_start_date || '-'})</td>
+                                        <td class="p-2">${student.edu_hvoc_end_year || '-'} (${student.edu_hvoc_end_date || '-'})</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2 font-bold">ปริญญาตรี (ถ้ามี)</td>
+                                        <td class="p-2">${student.edu_uni_school || '-'}</td>
+                                        <td class="p-2">${student.edu_uni_major || '-'}</td>
+                                        <td class="p-2">${student.edu_uni_start_year || '-'} (${student.edu_uni_start_date || '-'})</td>
+                                        <td class="p-2">${student.edu_uni_end_year || '-'} (${student.edu_uni_end_date || '-'})</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-xs pt-1">
+                            <span class="text-slate-500">ประวัติหยุดเรียนกลางคัน:</span> <span class="font-semibold text-slate-800">${student.eduInterrupted === 'none' ? 'ไม่มีประวัติ' : student.eduInterruptedDetails || 'เคยหยุดเรียน'}</span>
+                        </div>
+                    </div>
+
+                    <!-- ส่วนที่ 5: ประวัติการทำงานและการฝึกงาน -->
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-3">
+                        <h4 class="font-bold text-slate-800 border-b pb-2 flex items-center gap-1.5 text-sm uppercase">
+                            <span class="text-blue-600">Part 5:</span> ประวัติการทำงาน / ฝึกงาน (สูงสุด 9 ลำดับ)
+                        </h4>
+                        <div class="overflow-x-auto border rounded bg-white">
+                            <table class="w-full text-xxs text-left border-collapse">
+                                <thead class="bg-slate-100 text-slate-600 font-bold border-b">
+                                    <tr>
+                                        <th class="p-2 text-center w-8">#</th>
+                                        <th class="p-2">ชื่อสถานประกอบการ</th>
+                                        <th class="p-2 w-16">จังหวัด</th>
+                                        <th class="p-2">ประเภทกิจการ</th>
+                                        <th class="p-2">ลักษณะงาน / ตำแหน่ง</th>
+                                        <th class="p-2 w-16">เงินเดือน</th>
+                                        <th class="p-2">ระยะเวลา</th>
+                                        <th class="p-2 w-20">ประเภทงาน</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    ${renderWorkRows(student)}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- ส่วนที่ 6: เจตคติและเป้าหมายในชีวิต -->
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-3">
+                        <h4 class="font-bold text-slate-800 border-b pb-2 flex items-center gap-1.5 text-sm uppercase">
+                            <span class="text-blue-600">Part 6:</span> เป้าหมายชีวิตและจุดเด่น
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                            <div class="bg-white p-3 border rounded">
+                                <p class="text-slate-500 font-bold mb-1">เป้าหมายในชีวิต:</p>
+                                <p class="text-slate-800 leading-relaxed font-medium">${student.lifeGoal || '-'}</p>
+                            </div>
+                            <div class="bg-white p-3 border rounded">
+                                <p class="text-slate-500 font-bold mb-1">สิ่งที่ทำเวลาว่าง:</p>
+                                <p class="text-slate-800 leading-relaxed font-medium">${student.hobbies || '-'}</p>
+                            </div>
+                            <div class="bg-white p-3 border rounded">
+                                <p class="text-slate-500 font-bold mb-1">ข้อดีของตนเอง:</p>
+                                <p class="text-slate-800 leading-relaxed font-medium text-emerald-700">${student.strengths || '-'}</p>
+                            </div>
+                            <div class="bg-white p-3 border rounded">
+                                <p class="text-slate-500 font-bold mb-1">ข้อเสียของตนเอง:</p>
+                                <p class="text-slate-800 leading-relaxed font-medium text-amber-700">${student.weaknesses || '-'}</p>
+                            </div>
+                            <div class="bg-white p-3 border rounded md:col-span-2">
+                                <p class="text-slate-500 font-bold mb-1">ความสามารถพิเศษอื่นๆ:</p>
+                                <p class="text-slate-800 leading-relaxed font-medium">${student.specialSkills || '-'}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('modalContent').innerHTML = contentHtml;
+            document.getElementById('detailsModal').classList.remove('hidden');
+            document.getElementById('detailsModal').classList.add('flex');
+        }
+
+        // จัดเตรียมเรนเดอร์ตารางครอบครัว 1-8 ใน Dialog
+        function renderFamilyRows(student) {
+            let trHtml = '';
+            let hasAnyFamily = false;
+            
+            for (let i = 1; i <= 8; i++) {
+                const name = student[`fam_name_${i}`];
+                if (name && name.trim() !== '') {
+                    hasAnyFamily = true;
+                    trHtml += `
+                        <tr>
+                            <td class="p-2 text-center text-slate-500 font-semibold">${i}</td>
+                            <td class="p-2 font-semibold text-slate-800">${name}</td>
+                            <td class="p-2">${student[`fam_rel_${i}`] || '-'}</td>
+                            <td class="p-2">${student[`fam_age_${i}`] || '-'}</td>
+                            <td class="p-2">${student[`fam_job_${i}`] || '-'}</td>
+                            <td class="p-2">${student[`fam_work_${i}`] || '-'}</td>
+                            <td class="p-2 font-bold text-slate-700">${student[`fam_inc_${i}`] || '-'}</td>
+                            <td class="p-2">${student[`fam_prov_${i}`] || '-'}</td>
+                        </tr>
+                    `;
+                }
+            }
+            
+            if(!hasAnyFamily) {
+                return `<tr><td colspan="8" class="p-4 text-center text-slate-400 font-semibold">ไม่มีการบันทึกประวัติครอบครัวเพิ่มเติม</td></tr>`;
+            }
+            return trHtml;
+        }
+
+        // จัดเตรียมเรนเดอร์ตารางประวัติการทำงาน 1-9 ใน Dialog
+        function renderWorkRows(student) {
+            let trHtml = '';
+            let hasAnyWork = false;
+            
+            const typeMap = {
+                'work': 'งานประจำ',
+                'parttime': 'พาร์ทไทม์',
+                'intern_voc': 'ฝึกงาน ปวช.',
+                'intern_hvoc': 'ฝึกงาน ปวส.',
+                'intern_uni': 'ฝึกงาน ป.ตรี',
+                'break': 'ปิดเทอม',
+                'other': 'อื่นๆ'
+            };
+            
+            for (let i = 1; i <= 9; i++) {
+                const company = student[`work_${i}_company`];
+                if (company && company.trim() !== '') {
+                    hasAnyWork = true;
+                    const typeText = typeMap[student[`work_${i}_type`]] || student[`work_${i}_type`] || '-';
+                    trHtml += `
+                        <tr>
+                            <td class="p-2 text-center text-slate-500 font-semibold">${i}</td>
+                            <td class="p-2 font-semibold text-slate-800">${company}</td>
+                            <td class="p-2">${student[`work_${i}_province`] || '-'}</td>
+                            <td class="p-2">${student[`work_${i}_bizType`] || '-'}</td>
+                            <td class="p-2">${student[`work_${i}_jobDesc`] || '-'}</td>
+                            <td class="p-2 font-bold text-slate-700">${student[`work_${i}_salary`] || '-'}</td>
+                            <td class="p-2 text-slate-500">${student[`work_${i}_period`] || '-'}</td>
+                            <td class="p-2"><span class="bg-slate-100 text-slate-700 text-xxs px-2 py-0.5 rounded-full font-bold border">${typeText}</span></td>
+                        </tr>
+                    `;
+                }
+            }
+            
+            if(!hasAnyWork) {
+                return `<tr><td colspan="8" class="p-4 text-center text-slate-400 font-semibold">ไม่มีประวัติการทำงานบันทึกไว้ในระบบ</td></tr>`;
+            }
+            return trHtml;
+        }
+
+        // ปิดกล่องโมดอลข้อมูล
+        function closeDetailsModal() {
+            document.getElementById('detailsModal').classList.add('hidden');
+            document.getElementById('detailsModal').classList.remove('flex');
+        }
+
+        // บังคับการรีเจน PDF ใหม่ของนักศึกษาและอัปเดตระบบ
+        function regeneratePDF(studentId) {
+            const overlay = document.getElementById('loadingOverlay');
+            const text = document.getElementById('loadingText');
+            
+            text.innerText = `กำลังสร้างและเขียนไฟล์ PDF รหัส ${studentId} ใหม่...`;
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+            
+            google.script.run
+                .withSuccessHandler(response => {
+                    overlay.classList.add('hidden');
+                    overlay.classList.remove('flex');
+                    
+                    if (response.success) {
+                        alert('สร้าง PDF และอัปเดตระบบข้อมูลเรียบร้อยแล้วครับ!');
+                        window.open(response.url, '_blank');
+                        loadData(); // รีโหลดข้อมูลตารางใหม่เพื่อดึง pdfUrl ล่าสุดมาเซฟลงปุ่มดาวน์โหลด
+                    } else {
+                        alert('เกิดข้อผิดพลาดในการประมวลผล PDF: ' + response.message);
+                    }
+                })
+                .withFailureHandler(error => {
+                    overlay.classList.add('hidden');
+                    overlay.classList.remove('flex');
+                    alert('เกิดข้อผิดพลาดการเชื่อมต่อฝั่งเซิร์ฟเวอร์: ' + error);
+                })
+                .regenerateStudentPDF(adminPassword, studentId);
+        }
+
+        // นำทางย้อนกลับไปหน้ากรอกฟอร์มประวัติ
+        function goToForm() {
+            const btn = document.querySelector('button[onclick="goToForm()"]');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = 'กำลังเปลี่ยนหน้า...';
+            }
+            google.script.run.withSuccessHandler(url => {
+                window.open(url, "_top");
+            }).getScriptURL();
+        }
+
+        // สร้างข้อมูลนักศึกษาจำลอง 3 รายการ
+        function createMockData() {
+            if (!confirm("คุณต้องการสร้างข้อมูลนักศึกษาจำลอง 3 รายการใช่หรือไม่? (ระบบจะบันทึกข้อมูลและสร้างไฟล์ PDF จริงลงในระบบ)")) {
+                return;
+            }
+            
+            const overlay = document.getElementById('loadingOverlay');
+            const text = document.getElementById('loadingText');
+            
+            text.innerText = `กำลังประมวลผลสร้างข้อมูลจำลอง 3 รายการ...`;
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+            
+            google.script.run
+                .withSuccessHandler(results => {
+                    overlay.classList.add('hidden');
+                    overlay.classList.remove('flex');
+                    
+                    const successCount = results.filter(r => r.success).length;
+                    alert(`สร้างข้อมูลจำลองเสร็จสิ้น! สำเร็จ ${successCount} จากทั้งหมด 3 รายการครับ`);
+                    loadData();
+                })
+                .withFailureHandler(error => {
+                    overlay.classList.add('hidden');
+                    overlay.classList.remove('flex');
+                    alert('เกิดข้อผิดพลาดในการเรียกฝั่งเซิร์ฟเวอร์: ' + error);
+                })
+                .createThreeMockSubmissions();
+        }
+    </script>
+</body>
+</html>

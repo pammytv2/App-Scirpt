@@ -1,0 +1,7 @@
+node_modules/
+.DS_Store
+*.log
+# PDF extraction results
+PDF/extracted/
+PDF/original_extracted/
+PDF/PDF_TTT_extracted/
