@@ -21,7 +21,7 @@ const Controller = {
     }
     
     if (mode === 'admin') {
-      return View.render('Admin', 'ระบบจัดการข้อมูลนักศึกษา (Admin)');
+      return View.render('views/Admin', 'ระบบจัดการข้อมูลนักศึกษา (Admin)');
     }
     
     if (mode === 'qa') {
@@ -53,7 +53,7 @@ const Controller = {
       return QAService.runQATests();
     }
     
-    return View.render('Index', 'ระบบบันทึกใบประวัตินักศึกษา');
+    return View.render('views/Index', 'ระบบบันทึกใบประวัตินักศึกษา');
   },
 
   /**

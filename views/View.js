@@ -102,7 +102,7 @@ const View = {
     });
 
     // 3. เตรียม Html Template
-    const template = HtmlService.createTemplateFromFile('PdfTemplate');
+    const template = HtmlService.createTemplateFromFile('views/PdfTemplate');
     template.data = templateData;
     const htmlOutput = template.evaluate();
     
