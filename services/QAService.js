@@ -711,11 +711,8 @@ const QAService = {
     const rightCell = headerRow.appendTableCell();
     rightCell.setWidth(190);
     
-    // Left Cell Content: Logo and Title
-    const pLogo = leftCell.appendParagraph("AIU | 大 shogun Project\nโครงการไดโชกุน");
-    styleParagraph(pLogo, 9.5, true, DocumentApp.HorizontalAlignment.CENTER, '#000000');
-    pLogo.setSpacingAfter(4);
-    
+    // Left Cell Content: Title
+
     const pTitle = leftCell.appendParagraph("ใบประวัตินักศึกษา");
     styleParagraph(pTitle, 16, true, DocumentApp.HorizontalAlignment.CENTER, '#000000');
     pTitle.setSpacingAfter(8);
