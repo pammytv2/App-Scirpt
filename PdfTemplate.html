@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
@@ -19,29 +19,29 @@
     }
     body {
       font-family: 'THSarabunNew', sans-serif;
-      font-size: 16px; /* Adjusted to match standard Thai document size */
-      line-height: 1.15;
+      font-size: 15px; /* Reverted to original compact size */
+      line-height: 1.1;
       margin: 0;
       padding: 0;
       color: #000;
     }
     .page {
       page-break-after: always;
-      padding: 20px;
+      padding: 15px 25px; /* Reverted padding */
       box-sizing: border-box;
       width: 100%;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 10px;
+      margin-bottom: 5px; /* Reverted margin */
     }
     table, th, td {
       border: 1px solid #000;
     }
     th, td {
-      padding: 4px 6px;
-      vertical-align: top;
+      padding: 2px 4px; /* Reverted cell padding */
+      vertical-align: middle;
     }
     .no-border, .no-border td {
       border: none;
@@ -51,45 +51,57 @@
       font-weight: bold;
     }
     .center { text-align: center; }
+    .right { text-align: right; }
     .bold { font-weight: bold; }
     
     .header-table td {
       vertical-align: top;
       border: none;
+      padding: 0;
     }
     .staff-table {
-      border: 2px solid #000;
-      font-size: 14px;
+      border: 1px solid #000;
+      font-size: 13px; /* Reverted */
+      width: 220px; /* Reverted */
+      float: right;
     }
     .staff-table td {
       border: 1px solid #000;
-      padding: 2px 4px;
+      padding: 1px 3px;
     }
     .photo-box {
       border: 1px solid #000;
-      width: 100px;
-      height: 130px;
+      width: 100px; /* Reverted */
+      height: 125px; /* Reverted */
       text-align: center;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
       margin: 0 auto;
+      font-size: 12px; /* Reverted */
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .data-text {
-      color: #000; /* Black color for filled data */
+      color: #000;
+      font-weight: bold;
     }
     
     .label {
-      background-color: #f8fafc;
+      background-color: #fff;
       font-weight: bold;
-      width: 120px;
+      width: 110px; /* Reverted */
     }
     .val {
       width: auto;
     }
     .small-text {
-      font-size: 13px;
+      font-size: 12px; /* Reverted */
+    }
+    .dotted-line {
+      border-bottom: 1px dotted #000;
+      display: inline-block;
+      min-width: 50px; /* Reverted */
+      padding: 0 5px;
     }
   </style>
 </head>
@@ -97,79 +109,62 @@
 
 <!-- PAGE 1 -->
 <div class="page">
-  <table class="header-table no-border" style="margin-bottom: 20px;">
+  <!-- Header with Logos, Title, Photo and Staff Table -->
+  <table class="header-table no-border" style="margin-bottom: 10px;">
     <tr>
-      <td style="width: 30%;">
-        <div class="center" style="margin-bottom: 15px;">
-          <img src="data:image/png;base64,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" style="max-width: 140px; max-height: 100px; object-fit: contain;" />
-        </div>
-        <div style="margin-top: 25px;">
-          <table class="no-border" style="font-size: 16px; line-height: 1.15; width: 100%;">
-            <tr>
-              <td style="white-space: nowrap; width: 1%; padding: 2px 0;">วันที่สมัคร</td>
-              <td style="border-bottom: 1px dotted #000; text-align: center; width: 99%; padding: 2px 0;"><span class="data-text" ><?= data.applyDate ?></span></td>
-            </tr>
-            <tr>
-              <td style="white-space: nowrap; width: 1%; padding: 2px 0;">ทราบข้อมูลการสมัครจาก</td>
-              <td style="border-bottom: 1px dotted #000; text-align: center; width: 99%; padding: 2px 0;"><span class="data-text" ><?= data.applySource ?></span></td>
-            </tr>
-            <tr>
-              <td style="white-space: nowrap; width: 1%; padding: 2px 0;">สำนักงานสาขาที่รับสมัคร</td>
-              <td style="border-bottom: 1px dotted #000; text-align: center; width: 99%; padding: 2px 0;"><span class="data-text" ><?= data.applyBranch ?></span></td>
-            </tr>
-          </table>
+      <td style="width: 25%; vertical-align: top;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <img src="data:image/png;base64,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" style="height: 45px;">
+          <img src="data:image/png;base64,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" style="height: 45px;">
+          <div style="font-size: 10px; font-weight: bold; line-height: 1.2;">
+            AIU | 大 shogun Project<br>โครงการไดโชกุน
+          </div>
         </div>
       </td>
-      <td style="width: 30%; text-align: center; vertical-align: top;">
-        <div style="font-size: 26px; font-weight: bold; text-align: center; margin-top: 15px; margin-bottom: 15px;">
-          ใบประวัตินักศึกษา
-        </div>
-            <tr>
-              <td style="white-space: nowrap; width: 1%; padding: 2px 0;">วันที่สมัคร</td>
-              <td style="border-bottom: 1px dotted #000; text-align: center; width: 99%; padding: 2px 0;"><span class="data-text" ><?= data.applyDate ?></span></td>
-            </tr>
-            <tr>
-              <td style="white-space: nowrap; width: 1%; padding: 2px 0;">ทราบข้อมูลการสมัครจาก</td>
-              <td style="border-bottom: 1px dotted #000; text-align: center; width: 99%; padding: 2px 0;"><span class="data-text" ><?= data.applySource ?></span></td>
-            </tr>
-            <tr>
-              <td style="white-space: nowrap; width: 1%; padding: 2px 0;">สำนักงานสาขาที่รับสมัคร</td>
-              <td style="border-bottom: 1px dotted #000; text-align: center; width: 99%; padding: 2px 0;"><span class="data-text" ><?= data.applyBranch ?></span></td>
-            </tr>
-          </table>
+      <td style="width: 40%; text-align: center;">
+        <div style="font-size: 24px; font-weight: bold; margin-bottom: 5px;">ใบประวัตินักศึกษา</div>
+        <div class="photo-box">
+          รูปถ่าย<br>ขนาด 1 นิ้ว<br>(ติดหนีบคลิป)
         </div>
       </td>
-      <td style="width: 40%;">
+      <td style="width: 35%;">
         <table class="staff-table">
-          <tr><td colspan="3" class="bg-gray center">สำหรับเจ้าหน้าที่</td></tr>
-          <tr><td colspan="3">รหัสนักศึกษา : <span class="data-text"><?= data.studentId ?></span></td></tr>
+          <tr><td colspan="2" class="bg-gray center">สำหรับเจ้าหน้าที่</td></tr>
+          <tr><td colspan="2">รหัสนักศึกษา : <span class="data-text"><?= data.studentId ?></span></td></tr>
           <tr>
-            <td colspan="2" style="width: 60%;">
+            <td style="width: 65%;">
               <span class="data-text"><?= data.applySource_industry ?></span> อุตสาหกรรม<br>
               <span class="data-text"><?= data.applySource_service ?></span> ธุรกิจการบริการ<br>
               <span class="data-text"><?= data.applySource_elderly ?></span> การจัดการสุขภาพผู้สูงอายุ
             </td>
-            <td style="width: 40%;">
+            <td style="width: 35%;">
               <span class="data-text"><?= data.applyBranch_regular ?></span> ปกติ<br>
               <span class="data-text"><?= data.applyBranch_dvc ?></span> ทวิภาคี<br>
               <span class="data-text"><?= data.applyBranch_intern ?></span> ฝึกงาน
             </td>
           </tr>
-          <tr><td colspan="3">กำหนดสอบทุน...............................................</td></tr>
-          <tr><td colspan="3">ประชุมผู้ปกครองวันที่ : ..............................................</td></tr>
-          <tr><td colspan="3">ผู้เข้าร่วมประชุม : ..............................................</td></tr>
-          <tr><td colspan="3">ตรวจสุขภาพวันที่ : ..............................................</td></tr>
-          <tr><td colspan="3">ชื่อโรงพยาบาล : ..............................................</td></tr>
-          <tr><td colspan="3">ผลตรวจสุขภาพ &nbsp;&nbsp; ☐ ผ่าน &nbsp;&nbsp; ☐ ไม่ผ่าน</td></tr>
-          <tr><td colspan="3">☐ ชำระเงินสด</td></tr>
+          <tr><td colspan="2">กำหนดสอบทุน <span class="dotted-line" style="width: 100px;"></span></td></tr>
+          <tr><td colspan="2">ประชุมผู้ปกครองวันที่ : <span class="dotted-line" style="width: 90px;"></span></td></tr>
+          <tr><td colspan="2">ผู้เข้าร่วมประชุม : <span class="dotted-line" style="width: 110px;"></span></td></tr>
+          <tr><td colspan="2">ตรวจสุขภาพวันที่ : <span class="dotted-line" style="width: 100px;"></span></td></tr>
+          <tr><td colspan="2">ชื่อโรงพยาบาล : <span class="dotted-line" style="width: 110px;"></span></td></tr>
+          <tr><td colspan="2">ผลตรวจสุขภาพ &nbsp;&nbsp; ☐ ผ่าน &nbsp;&nbsp; ☐ ไม่ผ่าน</td></tr>
+          <tr><td colspan="2">☐ ชำระเงินสด</td></tr>
           <tr>
-            <td style="width: 40%;">☐ กู้กองทุน</td>
-            <td colspan="2">☐ หลักทรัพย์ &nbsp;&nbsp; ☐ บุคคลค้ำ</td>
+            <td style="border-right:none;">☐ กู้กองทุน</td>
+            <td>☐ หลักทรัพย์ &nbsp; ☐ บุคคลค้ำ</td>
           </tr>
         </table>
       </td>
     </tr>
   </table>
+
+  <!-- Application Metadata -->
+  <div style="margin-bottom: 10px; font-size: 16px;">
+    วันที่สมัคร <span class="dotted-line" style="min-width: 150px; text-align: center;"><span class="data-text"><?= data.applyDate ?></span></span><br>
+    ทราบข้อมูลการสมัครจาก <span class="dotted-line" style="min-width: 300px; text-align: center;"><span class="data-text"><?= data.applySource ?></span></span><br>
+    สำนักงานสาขาที่รับสมัคร <span class="dotted-line" style="min-width: 250px; text-align: center;"><span class="data-text"><?= data.applyBranch ?></span></span>
+  </div>
 
   <table style="border: 2px solid #000;">
     <tr>
@@ -257,8 +252,8 @@
       <td colspan="5" style="padding: 0;">
         <table class="no-border" style="margin:0; width:100%; height:100%;">
           <tr class="center">
-            <td style="border-right: 1px solid #000; border-bottom: 1px solid #000;">ส่วนสูง<br>(ซม.)</td>
-            <td style="border-right: 1px solid #000; border-bottom: 1px solid #000;">น้ำหนัก<br>(กก.)</td>
+            <td style="border-right: 1px solid #000; border-bottom: 1px solid #000;">ส่วนสูง (ซม.)</td>
+            <td style="border-right: 1px solid #000; border-bottom: 1px solid #000;">น้ำหนัก (กก.)</td>
             <td style="border-right: 1px solid #000; border-bottom: 1px solid #000;">ค่า BMI</td>
             <td style="border-right: 1px solid #000; border-bottom: 1px solid #000;">สัดส่วนจริง</td>
             <td style="border-right: 1px solid #000; border-bottom: 1px solid #000;">ถนัดมือ</td>
@@ -270,7 +265,7 @@
             <td style="border-right: 1px solid #000;"><span class="data-text"><?= data.bmi ?></span></td>
             <td style="border-right: 1px solid #000; text-align: left;">
               <span class="data-text"><?= data.bodyShape_normal ?></span> ปกติ<br>
-              <span class="data-text"><?= data.bodyShape_thin ?></span> ผอม &nbsp; <span class="data-text"><?= data.bodyShape_fat ?></span> อ้วน
+              <span class="data-text"><?= data.bodyShape_thin ?></span> ผอม &nbsp; <span class="data-text"><?= data.bodyShape_chubby ?></span> อ้วน
             </td>
             <td style="border-right: 1px solid #000; text-align: left;">
               <span class="data-text"><?= data.handedness_left ?></span> ซ้าย<br>
@@ -312,7 +307,7 @@
             </td>
             <td>
               ขวา ................... &nbsp;&nbsp;
-              <span class="data-text"><?= data.contactsLeft ?></span> คอนแทคเลนส์
+              <span class="data-text"><?= data.contactsRight ?></span> คอนแทคเลนส์
             </td>
           </tr>
         </table>
@@ -379,7 +374,6 @@
       </td>
     </tr>
     
-    <!-- โรคประจำตัว Nested -->
     <tr>
       <td class="label">โรคประจำตัว</td>
       <td style="padding: 0;">
@@ -399,7 +393,7 @@
             </td>
             <td style="border-bottom: 1px solid #000; width: 34%;">
               <span class="data-text"><?= data.disease_depression ?></span> ภาวะซึมเศร้า<br>
-              <span class="data-text"><?= data.disease_anxiety ?></span> วิตกกังวล/แพนิค<br>
+              <span class="data-text"><?= data.disease_anxiety ?></span> วิตกกกังวล/แพนิค<br>
               <span class="data-text"><?= data.disease_other ?></span> มีโรคประจำตัวอื่นๆ
             </td>
           </tr>
@@ -410,7 +404,6 @@
       </td>
     </tr>
     
-    <!-- ร่างกาย Nested -->
     <tr>
       <td class="label">ร่างกาย</td>
       <td style="padding: 0;">
@@ -457,103 +450,20 @@
         <span class="data-text"><?= data.periodPain_severe ?></span> ปวดมากจนมีผลต่อการดำเนินชีวิตประจำวัน
       </td>
     </tr>
-    <tr>
-      <td class="label">สูบบุหรี่</td>
-      <td>
-        <span class="data-text"><?= data.smoke_never ?></span> ไม่สูบ &nbsp;
-        <span class="data-text"><?= data.smoke_regular ?></span> สูบประจำ &nbsp;
-        <span class="data-text"><?= data.smoke_sometimes ?></span> สูบบางครั้ง (เฉลี่ยวันละ: <span class="data-text"><?= data.smokeQty ?></span> มวน)
-      </td>
-    </tr>
-    <tr>
-      <td class="label">บุหรี่ไฟฟ้า</td>
-      <td>
-        <span class="data-text"><?= data.vape_never ?></span> ไม่สูบ &nbsp;
-        <span class="data-text"><?= data.vape_regular ?></span> สูบประจำ &nbsp;
-        <span class="data-text"><?= data.vape_sometimes ?></span> สูบบางครั้ง (เฉลี่ยวันละ: <span class="data-text"><?= data.vapeQty ?></span> ครั้ง)
-      </td>
-    </tr>
-    <tr>
-      <td class="label">สูบกัญชา</td>
-      <td>
-        <span class="data-text"><?= data.cannabis_never ?></span> ไม่สูบ &nbsp;
-        <span class="data-text"><?= data.cannabis_regular ?></span> สูบประจำ &nbsp;
-        <span class="data-text"><?= data.cannabis_sometimes ?></span> สูบบางครั้ง (เฉลี่ยวันละ: <span class="data-text"><?= data.cannabisQty ?></span> ครั้ง)
-      </td>
-    </tr>
-    <tr>
-      <td class="label">ดื่มน้ำกระท่อม</td>
-      <td>
-        <span class="data-text"><?= data.kratom_never ?></span> ไม่ดื่ม &nbsp;
-        <span class="data-text"><?= data.kratom_regular ?></span> ดื่มประจำ &nbsp;
-        <span class="data-text"><?= data.kratom_sometimes ?></span> ดื่มบางครั้ง (เฉลี่ยสัปดาห์ละ: <span class="data-text"><?= data.kratomQty ?></span> วัน)
-      </td>
-    </tr>
-    <tr>
-      <td class="label">ดื่มแอลกอฮอล์</td>
-      <td>
-        <span class="data-text"><?= data.alcohol_never ?></span> ไม่ดื่ม &nbsp;
-        <span class="data-text"><?= data.alcohol_regular ?></span> ดื่มประจำ &nbsp;
-        <span class="data-text"><?= data.alcohol_sometimes ?></span> ดื่มบางครั้ง (เฉลี่ยสัปดาห์ละ: <span class="data-text"><?= data.alcoholQty ?></span> วัน)
-      </td>
-    </tr>
+    <tr><td class="label">สูบบุหรี่</td><td><span class="data-text"><?= data.smoke_never ?></span> ไม่สูบ &nbsp; <span class="data-text"><?= data.smoke_regular ?></span> สูบประจำ &nbsp; <span class="data-text"><?= data.smoke_sometimes ?></span> สูบบางครั้ง (เฉลี่ยวันละ: <span class="data-text"><?= data.smokeQty ?></span> มวน)</td></tr>
+    <tr><td class="label">บุหรี่ไฟฟ้า</td><td><span class="data-text"><?= data.vape_never ?></span> ไม่สูบ &nbsp; <span class="data-text"><?= data.vape_regular ?></span> สูบประจำ &nbsp; <span class="data-text"><?= data.vape_sometimes ?></span> สูบบางครั้ง (เฉลี่ยวันละ: <span class="data-text"><?= data.vapeQty ?></span> ครั้ง)</td></tr>
+    <tr><td class="label">สูบกัญชา</td><td><span class="data-text"><?= data.cannabis_never ?></span> ไม่สูบ &nbsp; <span class="data-text"><?= data.cannabis_regular ?></span> สูบประจำ &nbsp; <span class="data-text"><?= data.cannabis_sometimes ?></span> สูบบางครั้ง (เฉลี่ยวันละ: <span class="data-text"><?= data.cannabisQty ?></span> ครั้ง)</td></tr>
+    <tr><td class="label">ดื่มน้ำกระท่อม</td><td><span class="data-text"><?= data.kratom_never ?></span> ไม่ดื่ม &nbsp; <span class="data-text"><?= data.kratom_regular ?></span> ดื่มประจำ &nbsp; <span class="data-text"><?= data.kratom_sometimes ?></span> ดื่มบางครั้ง (เฉลี่ยสัปดาห์ละ: <span class="data-text"><?= data.kratomQty ?></span> วัน)</td></tr>
+    <tr><td class="label">ดื่มแอลกอฮอล์</td><td><span class="data-text"><?= data.alcohol_never ?></span> ไม่ดื่ม &nbsp; <span class="data-text"><?= data.alcohol_regular ?></span> ดื่มประจำ &nbsp; <span class="data-text"><?= data.alcohol_sometimes ?></span> ดื่มบางครั้ง (เฉลี่ยสัปดาห์ละ: <span class="data-text"><?= data.alcoholQty ?></span> วัน)</td></tr>
     
     <tr><td colspan="2" class="bg-gray center" style="font-size: 18px;">ด้านเอกสารส่วนตัว</td></tr>
     
-    <tr>
-      <td class="label">ใบอนุญาตขับขี่</td>
-      <td>
-        <span class="data-text"><?= data.driverLicense_none ?></span> ไม่มี &nbsp;
-        <span class="data-text"><?= data.driverLicense_has ?></span> มี &nbsp;
-        รถยนต์ <span class="data-text"><?= data.licenseCar ?></span> &nbsp;
-        รถจักรยานยนต์ <span class="data-text"><?= data.licenseMotorcycle ?></span>
-      </td>
-    </tr>
-    <tr>
-      <td class="label">เคยมีพาสปอร์ตหรือไม่</td>
-      <td>
-        <span class="data-text"><?= data.passport_none ?></span> ไม่มี &nbsp;
-        <span class="data-text"><?= data.passport_has ?></span> มี เพราะ: <span class="data-text"><?= data.passportReason ?></span> 
-        ประเทศ: <span class="data-text"><?= data.passportCountry ?></span><br>
-        เมื่อ: <span class="data-text"><?= data.passportTime ?></span> &nbsp; พาสปอร์ตหมดอายุปี: <span class="data-text"><?= data.passportExpireYear ?></span>
-      </td>
-    </tr>
-    <tr>
-      <td class="label">เคยไปญี่ปุ่นหรือไม่</td>
-      <td>
-        <span class="data-text"><?= data.japanVisit_none ?></span> ไม่เคย &nbsp;
-        <span class="data-text"><?= data.japanVisit_has ?></span> เคย เพราะ: <span class="data-text"><?= data.japanVisitReason ?></span> 
-        ประเภทวีซ่า: <span class="data-text"><?= data.japanVisitVisaType ?></span><br>
-        เมื่อ: <span class="data-text"><?= data.japanVisitTime ?></span>
-      </td>
-    </tr>
-    <tr>
-      <td class="label">เคยสมัครงานไปญี่ปุ่น<br>กับบริษัทอื่นหรือไม่</td>
-      <td>
-        <span class="data-text"><?= data.japanApply_none ?></span> ไม่เคย &nbsp;
-        <span class="data-text"><?= data.japanApply_has ?></span> เคย บริษัท: <span class="data-text"><?= data.japanApplyCompany ?></span> 
-        เมื่อ: <span class="data-text"><?= data.japanApplyTime ?></span><br>
-        ถึงขั้นตอน: <span class="data-text"><?= data.japanApplyStep ?></span> &nbsp; เหตุผลที่ถอนตัว: <span class="data-text"><?= data.japanApplyWithdrawReason ?></span>
-      </td>
-    </tr>
-    <tr>
-      <td class="label">เคยมีคดีความอาญา<br>หรือไม่</td>
-      <td>
-        <span class="data-text"><?= data.criminalRecord_none ?></span> ไม่มี &nbsp;
-        <span class="data-text"><?= data.criminalRecord_has ?></span> มี เรื่อง: <span class="data-text"><?= data.criminalRecordDetails ?></span>
-      </td>
-    </tr>
-    <tr>
-      <td class="label">มีภาระหนี้สินหรือไม่</td>
-      <td>
-        นักศึกษา <span class="data-text"><?= data.studentDebt_none ?></span> ไม่มี &nbsp;
-        <span class="data-text"><?= data.studentDebt_has ?></span> มี กู้มาจาก: <span class="data-text"><?= data.studentDebtSource ?></span> &nbsp;
-        เหตุผล: <span class="data-text"><?= data.studentDebtReason ?></span> &nbsp; จำนวน: <span class="data-text"><?= data.studentDebtAmount ?></span> บาท<br>
-        ผู้ปกครอง <span class="data-text"><?= data.parentDebt_none ?></span> ไม่มี &nbsp;
-        <span class="data-text"><?= data.parentDebt_has ?></span> มี กู้มาจาก: <span class="data-text"><?= data.parentDebtSource ?></span> &nbsp;
-        เหตุผล: <span class="data-text"><?= data.parentDebtReason ?></span> &nbsp; จำนวน: <span class="data-text"><?= data.parentDebtAmount ?></span> บาท
-      </td>
-    </tr>
+    <tr><td class="label">ใบอนุญาตขับขี่</td><td><span class="data-text"><?= data.driverLicense_none ?></span> ไม่มี &nbsp; <span class="data-text"><?= data.driverLicense_has ?></span> มี &nbsp; รถยนต์ <span class="data-text"><?= data.licenseCar ?></span> &nbsp; รถจักรยานยนต์ <span class="data-text"><?= data.licenseMotorcycle ?></span></td></tr>
+    <tr><td class="label">เคยมีพาสปอร์ตหรือไม่</td><td><span class="data-text"><?= data.passport_none ?></span> ไม่มี &nbsp; <span class="data-text"><?= data.passport_has ?></span> มี เพราะ: <span class="data-text"><?= data.passportReason ?></span> ประเทศ: <span class="data-text"><?= data.passportCountry ?></span><br>เมื่อ: <span class="data-text"><?= data.passportTime ?></span> &nbsp; พาสปอร์ตหมดอายุปี: <span class="data-text"><?= data.passportExpireYear ?></span></td></tr>
+    <tr><td class="label">เคยไปญี่ปุ่นหรือไม่</td><td><span class="data-text"><?= data.japanVisit_none ?></span> ไม่เคย &nbsp; <span class="data-text"><?= data.japanVisit_has ?></span> เคย เพราะ: <span class="data-text"><?= data.japanVisitReason ?></span> ประเภทวีซ่า: <span class="data-text"><?= data.japanVisitVisaType ?></span><br>เมื่อ: <span class="data-text"><?= data.japanVisitTime ?></span></td></tr>
+    <tr><td class="label">เคยสมัครงานไปญี่ปุ่น<br>กับบริษัทอื่นหรือไม่</td><td><span class="data-text"><?= data.japanApply_none ?></span> ไม่เคย &nbsp; <span class="data-text"><?= data.japanApply_has ?></span> เคย บริษัท: <span class="data-text"><?= data.japanApplyCompany ?></span> เมื่อ: <span class="data-text"><?= data.japanApplyTime ?></span><br>ถึงขั้นตอน: <span class="data-text"><?= data.japanApplyStep ?></span> &nbsp; เหตุผลที่ถอนตัว: <span class="data-text"><?= data.japanApplyWithdrawReason ?></span></td></tr>
+    <tr><td class="label">เคยมีคดีความอาญา<br>หรือไม่</td><td><span class="data-text"><?= data.criminalRecord_none ?></span> ไม่มี &nbsp; <span class="data-text"><?= data.criminalRecord_has ?></span> มี เรื่อง: <span class="data-text"><?= data.criminalRecordDetails ?></span></td></tr>
+    <tr><td class="label">มีภาระหนี้สินหรือไม่</td><td>นักศึกษา <span class="data-text"><?= data.studentDebt_none ?></span> ไม่มี &nbsp; <span class="data-text"><?= data.studentDebt_has ?></span> มี กู้มาจาก: <span class="data-text"><?= data.studentDebtSource ?></span> &nbsp; เหตุผล: <span class="data-text"><?= data.studentDebtReason ?></span> &nbsp; จำนวน: <span class="data-text"><?= data.studentDebtAmount ?></span> บาท<br>ผู้ปกครอง <span class="data-text"><?= data.parentDebt_none ?></span> ไม่มี &nbsp; <span class="data-text"><?= data.parentDebt_has ?></span> มี กู้มาจาก: <span class="data-text"><?= data.parentDebtSource ?></span> &nbsp; เหตุผล: <span class="data-text"><?= data.parentDebtReason ?></span> &nbsp; จำนวน: <span class="data-text"><?= data.parentDebtAmount ?></span> บาท</td></tr>
   </table>
 </div>
 
@@ -561,55 +471,12 @@
 <div class="page">
   <table style="border: 2px solid #000;">
     <tr><td colspan="8" class="bg-gray center" style="font-size: 18px;">ประวัติครอบครัว</td></tr>
-    <tr class="center bg-gray">
-      <td style="width: 5%;">ลำดับ</td>
-      <td style="width: 25%;">ชื่อ-นามสกุล</td>
-      <td style="width: 10%;">ความสัมพันธ์</td>
-      <td style="width: 5%;">อายุ</td>
-      <td style="width: 15%;">อาชีพ</td>
-      <td style="width: 20%;">สถานที่ทำงาน/บริษัท</td>
-      <td style="width: 10%;">รายได้ (ต่อเดือน)</td>
-      <td style="width: 10%;">จังหวัด</td>
-    </tr>
+    <tr class="center bg-gray"><td style="width: 5%;">ลำดับ</td><td style="width: 25%;">ชื่อ-นามสกุล</td><td style="width: 10%;">ความสัมพันธ์</td><td style="width: 5%;">อายุ</td><td style="width: 15%;">อาชีพ</td><td style="width: 20%;">สถานที่ทำงาน/บริษัท</td><td style="width: 10%;">รายได้ (ต่อเดือน)</td><td style="width: 10%;">จังหวัด</td></tr>
     <? for(let i=1; i<=8; i++) { ?>
-    <tr class="center">
-      <td><?= i ?></td>
-      <td><span class="data-text"><?= data['fam_name_'+i] ?></span></td>
-      <td><span class="data-text"><?= data['fam_rel_'+i] ?></span></td>
-      <td><span class="data-text"><?= data['fam_age_'+i] ?></span></td>
-      <td><span class="data-text"><?= data['fam_job_'+i] ?></span></td>
-      <td><span class="data-text"><?= data['fam_work_'+i] ?></span></td>
-      <td><span class="data-text"><?= data['fam_income_'+i] ?></span></td>
-      <td><span class="data-text"><?= data['fam_prov_'+i] ?></span></td>
-    </tr>
+    <tr class="center"><td><?= i ?></td><td><span class="data-text"><?= data['fam_name_'+i] ?></span></td><td><span class="data-text"><?= data['fam_rel_'+i] ?></span></td><td><span class="data-text"><?= data['fam_age_'+i] ?></span></td><td><span class="data-text"><?= data['fam_job_'+i] ?></span></td><td><span class="data-text"><?= data['fam_work_'+i] ?></span></td><td><span class="data-text"><?= data['fam_income_'+i] ?></span></td><td><span class="data-text"><?= data['fam_prov_'+i] ?></span></td></tr>
     <? } ?>
-    <tr>
-      <td colspan="2" class="label">สถานะครอบครัว</td>
-      <td colspan="6">
-        <span class="data-text"><?= data.familyStatus_together ?></span> อยู่ร่วมกัน &nbsp;
-        <span class="data-text"><?= data.familyStatus_divorced ?></span> พ่อแม่หย่าร้าง (จดทะเบียนหย่า) &nbsp;
-        <span class="data-text"><?= data.familyStatus_separated ?></span> พ่อแม่แยกทาง (ไม่ได้จดทะเบียน)<br>
-        <span class="data-text"><?= data.familyStatus_father_deceased ?></span> บิดาเสียชีวิต &nbsp;
-        <span class="data-text"><?= data.familyStatus_mother_deceased ?></span> มารดาเสียชีวิต<br>
-        ปัจจุบันอยู่ในความดูแล/ปกครองของใคร: <span class="data-text"><?= data.guardian ?></span>
-      </td>
-    </tr>
-    <tr>
-      <td colspan="2" class="label">มีคนรู้จักที่อยู่ญี่ปุ่นหรือไม่</td>
-      <td colspan="6">
-        <span class="data-text"><?= data.japanContact_none ?></span> ไม่มี &nbsp;
-        <span class="data-text"><?= data.japanContact_has ?></span> มี<br>
-        ชื่อ - นามสกุล: <span class="data-text"><?= data.japanContactName ?></span> &nbsp;&nbsp;&nbsp;
-        เพศ: <span class="data-text"><?= data.japanContactGender_M ?></span> ชาย &nbsp; <span class="data-text"><?= data.japanContactGender_F ?></span> หญิง &nbsp;&nbsp;&nbsp;
-        อายุ: <span class="data-text"><?= data.japanContactAge ?></span> ปี<br>
-        ความสัมพันธ์: <span class="data-text"><?= data.japanContactRel ?></span> &nbsp;&nbsp;&nbsp;
-        ที่อยู่ญี่ปุ่น: <span class="data-text"><?= data.japanContactAddress ?></span><br>
-        เบอร์โทร: <span class="data-text"><?= data.japanContactPhone ?></span> &nbsp;&nbsp;&nbsp;
-        อยู่ญี่ปุ่นกี่ปี: <span class="data-text"><?= data.japanContactYears ?></span><br>
-        Facebook: <span class="data-text"><?= data.japanContactFb ?></span> &nbsp;&nbsp;&nbsp;
-        ประเภทวีซ่า: <span class="data-text"><?= data.japanContactVisa ?></span>
-      </td>
-    </tr>
+    <tr><td colspan="2" class="label">สถานะครอบครัว</td><td colspan="6"><span class="data-text"><?= data.familyStatus_together ?></span> อยู่ร่วมกัน &nbsp; <span class="data-text"><?= data.familyStatus_divorced ?></span> พ่อแม่หย่าร้าง (จดทะเบียนหย่า) &nbsp; <span class="data-text"><?= data.familyStatus_separated ?></span> พ่อแม่แยกทาง (ไม่ได้จดทะเบียน)<br><span class="data-text"><?= data.familyStatus_father_deceased ?></span> บิดาเสียชีวิต &nbsp; <span class="data-text"><?= data.familyStatus_mother_deceased ?></span> มารดาเสียชีวิต<br>ปัจจุบันอยู่ในความดูแล/ปกครองของใคร: <span class="data-text"><?= data.guardian ?></span></td></tr>
+    <tr><td colspan="2" class="label">มีคนรู้จักที่อยู่ญี่ปุ่นหรือไม่</td><td colspan="6"><span class="data-text"><?= data.japanContact_none ?></span> ไม่มี &nbsp; <span class="data-text"><?= data.japanContact_has ?></span> มี<br>ชื่อ - นามสกุล: <span class="data-text"><?= data.japanContactName ?></span> &nbsp;&nbsp;&nbsp; เพศ: <span class="data-text"><?= data.japanContactGender_M ?></span> ชาย &nbsp; <span class="data-text"><?= data.japanContactGender_F ?></span> หญิง &nbsp;&nbsp;&nbsp; อายุ: <span class="data-text"><?= data.japanContactAge ?></span> ปี<br>ความสัมพันธ์: <span class="data-text"><?= data.japanContactRel ?></span> &nbsp;&nbsp;&nbsp; ที่อยู่ญี่ปุ่น: <span class="data-text"><?= data.japanContactAddress ?></span><br>เบอร์โทร: <span class="data-text"><?= data.japanContactPhone ?></span> &nbsp;&nbsp;&nbsp; อยู่ญี่ปุ่นกี่ปี: <span class="data-text"><?= data.japanContactYears ?></span><br>Facebook: <span class="data-text"><?= data.japanContactFb ?></span> &nbsp;&nbsp;&nbsp; ประเภทวีซ่า: <span class="data-text"><?= data.japanContactVisa ?></span></td></tr>
   </table>
 </div>
 
@@ -617,105 +484,19 @@
 <div class="page">
   <table style="border: 2px solid #000;">
     <tr><td colspan="4" class="bg-gray center" style="font-size: 18px;">ประวัติการศึกษา</td></tr>
-    <tr class="center bg-gray">
-      <td style="width: 25%;"></td>
-      <td style="width: 30%;">ชื่อสถานศึกษา</td>
-      <td style="width: 20%;">สาขา/แผนก</td>
-      <td style="width: 25%;">เข้าศึกษา-สำเร็จการศึกษา</td>
-    </tr>
-    <tr class="center">
-      <td class="label" style="text-align:left;">มัธยมต้น</td>
-      <td><span class="data-text"><?= data.edu_m3_school ?></span></td>
-      <td><span class="data-text"><?= data.edu_m3_major ?></span></td>
-      <td>
-        ปีที่เข้า: <span class="data-text"><?= data.edu_m3_start_year ?></span><br>
-        ปีที่จบ: <span class="data-text"><?= data.edu_m3_end_year ?></span>
-      </td>
-    </tr>
-    <tr class="center">
-      <td class="label" style="text-align:left;">มัธยมปลาย/<br>ปวช.</td>
-      <td><span class="data-text"><?= data.edu_voc_school ?></span></td>
-      <td><span class="data-text"><?= data.edu_voc_major ?></span></td>
-      <td>
-        ปีที่เข้า: <span class="data-text"><?= data.edu_voc_start_year ?></span><br>
-        ปีที่จบ: <span class="data-text"><?= data.edu_voc_end_year ?></span>
-      </td>
-    </tr>
-    <tr class="center">
-      <td class="label" style="text-align:left;">ปวส./ทวิภาคี</td>
-      <td><span class="data-text"><?= data.edu_hvoc_school ?></span></td>
-      <td><span class="data-text"><?= data.edu_hvoc_major ?></span></td>
-      <td>
-        ปีที่เข้า: <span class="data-text"><?= data.edu_hvoc_start_year ?></span><br>
-        ปีที่จบ: <span class="data-text"><?= data.edu_hvoc_end_year ?></span>
-      </td>
-    </tr>
-    <tr class="center">
-      <td class="label" style="text-align:left;">ปริญญาตรี</td>
-      <td><span class="data-text"><?= data.edu_uni_school ?></span></td>
-      <td><span class="data-text"><?= data.edu_uni_major ?></span></td>
-      <td>
-        ปีที่เข้า: <span class="data-text"><?= data.edu_uni_start_year ?></span><br>
-        ปีที่จบ: <span class="data-text"><?= data.edu_uni_end_year ?></span>
-      </td>
-    </tr>
-    <tr>
-      <td class="label">กรณีเรียนไม่ต่อเนื่อง/<br>ดรอป/<br>ลาออกระหว่างเรียน</td>
-      <td colspan="3">
-        <span class="data-text"><?= data.eduInterrupted_none ?></span> ไม่มีประวัติ &nbsp;
-        <span class="data-text"><?= data.eduInterrupted_drop ?></span> ดรอปเรียน &nbsp;
-        <span class="data-text"><?= data.eduInterrupted_quit ?></span> ลาออกระหว่างเรียน<br>
-        รายละเอียด/สาเหตุ: <span class="data-text"><?= data.eduInterruptedDetails ?></span>
-      </td>
-    </tr>
+    <tr class="center bg-gray"><td style="width: 25%;"></td><td style="width: 30%;">ชื่อสถานศึกษา</td><td style="width: 20%;">สาขา/แผนก</td><td style="width: 25%;">เข้าศึกษา-สำเร็จการศึกษา</td></tr>
+    <tr class="center"><td class="label" style="text-align:left;">มัธยมต้น</td><td><span class="data-text"><?= data.edu_m3_school ?></span></td><td><span class="data-text"><?= data.edu_m3_major ?></span></td><td>ปีที่เข้า: <span class="data-text"><?= data.edu_m3_start_year ?></span><br>ปีที่จบ: <span class="data-text"><?= data.edu_m3_end_year ?></span></td></tr>
+    <tr class="center"><td class="label" style="text-align:left;">มัธยมปลาย/ ปวช.</td><td><span class="data-text"><?= data.edu_voc_school ?></span></td><td><span class="data-text"><?= data.edu_voc_major ?></span></td><td>ปีที่เข้า: <span class="data-text"><?= data.edu_voc_start_year ?></span><br>ปีที่จบ: <span class="data-text"><?= data.edu_voc_end_year ?></span></td></tr>
+    <tr class="center"><td class="label" style="text-align:left;">ปวส./ทวิภาคี</td><td><span class="data-text"><?= data.edu_hvoc_school ?></span></td><td><span class="data-text"><?= data.edu_hvoc_major ?></span></td><td>ปีที่เข้า: <span class="data-text"><?= data.edu_hvoc_start_year ?></span><br>ปีที่จบ: <span class="data-text"><?= data.edu_hvoc_end_year ?></span></td></tr>
+    <tr class="center"><td class="label" style="text-align:left;">ปริญญาตรี</td><td><span class="data-text"><?= data.edu_uni_school ?></span></td><td><span class="data-text"><?= data.edu_uni_major ?></span></td><td>ปีที่เข้า: <span class="data-text"><?= data.edu_uni_start_year ?></span><br>ปีที่จบ: <span class="data-text"><?= data.edu_uni_end_year ?></span></td></tr>
+    <tr><td class="label">กรณีเรียนไม่ต่อเนื่อง/ ดรอป/ ลาออกระหว่างเรียน</td><td colspan="3"><span class="data-text"><?= data.eduInterrupted_none ?></span> ไม่มีประวัติ &nbsp; <span class="data-text"><?= data.eduInterrupted_drop ?></span> ดรอปเรียน &nbsp; <span class="data-text"><?= data.eduInterrupted_quit ?></span> ลาออกระหว่างเรียน<br>รายละเอียด/สาเหตุ: <span class="data-text"><?= data.eduInterruptedDetails ?></span></td></tr>
   </table>
 
   <table style="border: 2px solid #000;">
     <tr><td colspan="2" class="bg-gray center" style="font-size: 18px;">ประวัติการทำงาน</td></tr>
-    <tr class="bg-gray center">
-      <td style="width: 5%;">ลำดับ</td>
-      <td style="width: 95%;">รายละเอียด</td>
-    </tr>
+    <tr class="bg-gray center"><td style="width: 5%;">ลำดับ</td><td style="width: 95%;">รายละเอียด</td></tr>
     <? for(let i=1; i<=3; i++) { ?>
-    <tr>
-      <td class="center bold"><?= i ?></td>
-      <td style="padding:0;">
-        <table class="no-border" style="margin:0; width:100%; height:100%;">
-          <tr>
-            <td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">ชื่อบริษัท</td>
-            <td style="border-right: 1px solid #000; border-bottom: 1px solid #000; width: 45%;"><span class="data-text"><?= data['work_'+i+'_company'] ?></span></td>
-            <td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">จังหวัด</td>
-            <td style="border-bottom: 1px solid #000;"><span class="data-text"><?= data['work_'+i+'_province'] ?></span></td>
-          </tr>
-          <tr>
-            <td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">ประเภทกิจการ</td>
-            <td colspan="3" style="border-bottom: 1px solid #000;"><span class="data-text"><?= data['work_'+i+'_bizType'] ?></span></td>
-          </tr>
-          <tr>
-            <td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">ลักษณะงานที่ทำ</td>
-            <td style="border-right: 1px solid #000; border-bottom: 1px solid #000;"><span class="data-text"><?= data['work_'+i+'_jobDesc'] ?></span></td>
-            <td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">เงินเดือน</td>
-            <td style="border-bottom: 1px solid #000;"><span class="data-text"><?= data['work_'+i+'_salary'] ?></span></td>
-          </tr>
-          <tr>
-            <td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">เริ่มงาน-ลาออก</td>
-            <td colspan="3" style="border-bottom: 1px solid #000;"><span class="data-text"><?= data['work_'+i+'_period'] ?></span></td>
-          </tr>
-          <tr>
-            <td class="label" style="border-right: 1px solid #000;">ประเภทงาน</td>
-            <td colspan="3">
-              <span class="data-text"><?= data['work_'+i+'_type_work'] ?></span> ทำงาน &nbsp;
-              <span class="data-text"><?= data['work_'+i+'_type_parttime'] ?></span> พาร์ทไทม์ &nbsp;
-              <span class="data-text"><?= data['work_'+i+'_type_intern_voc'] ?></span> ฝึกงาน ปวช. &nbsp;
-              <span class="data-text"><?= data['work_'+i+'_type_intern_hvoc'] ?></span> ฝึกงาน ปวส. &nbsp;
-              <span class="data-text"><?= data['work_'+i+'_type_intern_uni'] ?></span> ฝึกงาน ป.ตรี<br>
-              <span class="data-text"><?= data['work_'+i+'_type_break'] ?></span> ช่วงปิดเทอม &nbsp;
-              <span class="data-text"><?= data['work_'+i+'_type_other'] ?></span> อื่นๆ
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
+    <tr><td class="center bold"><?= i ?></td><td style="padding:0;"><table class="no-border" style="margin:0; width:100%; height:100%;"><tr><td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">ชื่อบริษัท</td><td style="border-right: 1px solid #000; border-bottom: 1px solid #000; width: 45%;"><span class="data-text"><?= data['work_'+i+'_company'] ?></span></td><td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">จังหวัด</td><td style="border-bottom: 1px solid #000;"><span class="data-text"><?= data['work_'+i+'_province'] ?></span></td></tr><tr><td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">ประเภทกิจการ</td><td colspan="3" style="border-bottom: 1px solid #000;"><span class="data-text"><?= data['work_'+i+'_bizType'] ?></span></td></tr><tr><td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">ลักษณะงานที่ทำ</td><td style="border-right: 1px solid #000; border-bottom: 1px solid #000;"><span class="data-text"><?= data['work_'+i+'_jobDesc'] ?></span></td><td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">เงินเดือน</td><td style="border-bottom: 1px solid #000;"><span class="data-text"><?= data['work_'+i+'_salary'] ?></span></td></tr><tr><td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">เริ่มงาน-ลาออก</td><td colspan="3" style="border-bottom: 1px solid #000;"><span class="data-text"><?= data['work_'+i+'_period'] ?></span></td></tr><tr><td class="label" style="border-right: 1px solid #000;">ประเภทงาน</td><td colspan="3"><span class="data-text"><?= data['work_'+i+'_type_work'] ?></span> ทำงาน &nbsp; <span class="data-text"><?= data['work_'+i+'_type_parttime'] ?></span> พาร์ทไทม์ &nbsp; <span class="data-text"><?= data['work_'+i+'_type_intern_voc'] ?></span> ฝึกงาน ปวช. &nbsp; <span class="data-text"><?= data['work_'+i+'_type_intern_hvoc'] ?></span> ฝึกงาน ปวส. &nbsp; <span class="data-text"><?= data['work_'+i+'_type_intern_uni'] ?></span> ฝึกงาน ป.ตรี<br><span class="data-text"><?= data['work_'+i+'_type_break'] ?></span> ช่วงปิดเทอม &nbsp; <span class="data-text"><?= data['work_'+i+'_type_other'] ?></span> อื่นๆ</td></tr></table></td></tr>
     <? } ?>
   </table>
 </div>
@@ -724,50 +505,9 @@
 <div class="page">
   <table style="border: 2px solid #000;">
     <tr><td colspan="2" class="bg-gray center" style="font-size: 18px;">ประวัติการทำงาน (ต่อ)</td></tr>
-    <tr class="bg-gray center">
-      <td style="width: 5%;">ลำดับ</td>
-      <td style="width: 95%;">รายละเอียด</td>
-    </tr>
+    <tr class="bg-gray center"><td style="width: 5%;">ลำดับ</td><td style="width: 95%;">รายละเอียด</td></tr>
     <? for(let i=4; i<=9; i++) { ?>
-    <tr>
-      <td class="center bold"><?= i ?></td>
-      <td style="padding:0;">
-        <table class="no-border" style="margin:0; width:100%; height:100%;">
-          <tr>
-            <td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">ชื่อบริษัท</td>
-            <td style="border-right: 1px solid #000; border-bottom: 1px solid #000; width: 45%;"><span class="data-text"><?= data['work_'+i+'_company'] ?></span></td>
-            <td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">จังหวัด</td>
-            <td style="border-bottom: 1px solid #000;"><span class="data-text"><?= data['work_'+i+'_province'] ?></span></td>
-          </tr>
-          <tr>
-            <td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">ประเภทกิจการ</td>
-            <td colspan="3" style="border-bottom: 1px solid #000;"><span class="data-text"><?= data['work_'+i+'_bizType'] ?></span></td>
-          </tr>
-          <tr>
-            <td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">ลักษณะงานที่ทำ</td>
-            <td style="border-right: 1px solid #000; border-bottom: 1px solid #000;"><span class="data-text"><?= data['work_'+i+'_jobDesc'] ?></span></td>
-            <td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">เงินเดือน</td>
-            <td style="border-bottom: 1px solid #000;"><span class="data-text"><?= data['work_'+i+'_salary'] ?></span></td>
-          </tr>
-          <tr>
-            <td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">เริ่มงาน-ลาออก</td>
-            <td colspan="3" style="border-bottom: 1px solid #000;"><span class="data-text"><?= data['work_'+i+'_period'] ?></span></td>
-          </tr>
-          <tr>
-            <td class="label" style="border-right: 1px solid #000;">ประเภทงาน</td>
-            <td colspan="3">
-              <span class="data-text"><?= data['work_'+i+'_type_work'] ?></span> ทำงาน &nbsp;
-              <span class="data-text"><?= data['work_'+i+'_type_parttime'] ?></span> พาร์ทไทม์ &nbsp;
-              <span class="data-text"><?= data['work_'+i+'_type_intern_voc'] ?></span> ฝึกงาน ปวช. &nbsp;
-              <span class="data-text"><?= data['work_'+i+'_type_intern_hvoc'] ?></span> ฝึกงาน ปวส. &nbsp;
-              <span class="data-text"><?= data['work_'+i+'_type_intern_uni'] ?></span> ฝึกงาน ป.ตรี<br>
-              <span class="data-text"><?= data['work_'+i+'_type_break'] ?></span> ช่วงปิดเทอม &nbsp;
-              <span class="data-text"><?= data['work_'+i+'_type_other'] ?></span> อื่นๆ
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
+    <tr><td class="center bold"><?= i ?></td><td style="padding:0;"><table class="no-border" style="margin:0; width:100%; height:100%;"><tr><td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">ชื่อบริษัท</td><td style="border-right: 1px solid #000; border-bottom: 1px solid #000; width: 45%;"><span class="data-text"><?= data['work_'+i+'_company'] ?></span></td><td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">จังหวัด</td><td style="border-bottom: 1px solid #000;"><span class="data-text"><?= data['work_'+i+'_province'] ?></span></td></tr><tr><td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">ประเภทกิจการ</td><td colspan="3" style="border-bottom: 1px solid #000;"><span class="data-text"><?= data['work_'+i+'_bizType'] ?></span></td></tr><tr><td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">ลักษณะงานที่ทำ</td><td style="border-right: 1px solid #000; border-bottom: 1px solid #000;"><span class="data-text"><?= data['work_'+i+'_jobDesc'] ?></span></td><td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">เงินเดือน</td><td style="border-bottom: 1px solid #000;"><span class="data-text"><?= data['work_'+i+'_salary'] ?></span></td></tr><tr><td class="label" style="border-right: 1px solid #000; border-bottom: 1px solid #000;">เริ่มงาน-ลาออก</td><td colspan="3" style="border-bottom: 1px solid #000;"><span class="data-text"><?= data['work_'+i+'_period'] ?></span></td></tr><tr><td class="label" style="border-right: 1px solid #000;">ประเภทงาน</td><td colspan="3"><span class="data-text"><?= data['work_'+i+'_type_work'] ?></span> ทำงาน &nbsp; <span class="data-text"><?= data['work_'+i+'_type_parttime'] ?></span> พาร์ทไทม์ &nbsp; <span class="data-text"><?= data['work_'+i+'_type_intern_voc'] ?></span> ฝึกงาน ปวช. &nbsp; <span class="data-text"><?= data['work_'+i+'_type_intern_hvoc'] ?></span> ฝึกงาน ปวส. &nbsp; <span class="data-text"><?= data['work_'+i+'_type_intern_uni'] ?></span> ฝึกงาน ป.ตรี<br><span class="data-text"><?= data['work_'+i+'_type_break'] ?></span> ช่วงปิดเทอม &nbsp; <span class="data-text"><?= data['work_'+i+'_type_other'] ?></span> อื่นๆ</td></tr></table></td></tr>
     <? } ?>
   </table>
 </div>
@@ -781,85 +521,26 @@
     <tr><td class="label">ข้อเสียของตนเอง</td><td><span class="data-text"><?= data.weaknesses ?></span></td></tr>
     <tr><td class="label">ความสามารถพิเศษ</td><td><span class="data-text"><?= data.specialSkills ?></span></td></tr>
   </table>
-
   <br>
-  
   <table style="border: 2px solid #000;">
     <tr><td colspan="4" class="bg-gray center" style="font-size: 18px;">แบบประเมิน</td></tr>
-    <tr class="center bg-gray">
-      <td style="width: 40%;">หัวข้อการประเมิน</td>
-      <td style="width: 15%;">ผ่าน</td>
-      <td style="width: 15%;">ไม่ผ่าน</td>
-      <td style="width: 30%;">หมายเหตุ</td>
-    </tr>
-    <tr>
-      <td>ทดสอบคณิตศาสตร์</td><td></td><td></td><td>................. / 30 คะแนน</td>
-    </tr>
-    <tr>
-      <td>ทดสอบเรียงไพ่</td><td></td><td></td>
-      <td>
-        ครั้งที่ 1 ........... นาที ผิด ........... จุด<br>
-        ครั้งที่ 2 ........... นาที ผิด ........... จุด
-      </td>
-    </tr>
-    <tr>
-      <td>ทดสอบสมรรถภาพร่างกาย</td><td></td><td></td>
-      <td>
-        ลุกนั่ง ......................... ครั้ง/1นาที<br>
-        ซิทอัพ ......................... ครั้ง/1นาที<br>
-        วิดพื้น ......................... ครั้ง/1นาที
-      </td>
-    </tr>
-    <tr>
-      <td colspan="4" style="font-size: 14px; background-color: #f8fafc;">
-        <span style="font-weight: bold; text-decoration: underline;">วิธีการประเมินและทดสอบ</span><br>
-        1. คุณสมบัติเบื้องต้น : พิจารณาตามเกณฑ์<br>
-        2. การทดสอบคณิตศาสตร์ : 30 ข้อ เวลา 10 นาที ผ่านเกณฑ์การประเมิน 15 ข้อขึ้นไป<br>
-        3. ทดสอบเรียงไพ่ : <br>
-        &nbsp;&nbsp; - แยกสีดำ สีแดง<br>
-        &nbsp;&nbsp; - แยกประเภทของไพ่ ดอกจิก หัวใจ โพดำ ข้าวหลามตัด<br>
-        &nbsp;&nbsp; - เรียงจากจำนวนน้อยไปหาจำนวนมาก A-10 และ ตามด้วย J,Q,K<br>
-        &nbsp;&nbsp; - เวลา 5 นาที และสามารถทำซ้ำได้ 2 รอบ<br>
-        ทดสอบสมรรถภาพ : วิดพื้น ลุกนั่ง และซิทอัพ เวลา 1 นาที ผ่านเกณฑ์การประเมิน 30 ครั้งขึ้นไป
-      </td>
-    </tr>
+    <tr class="center bg-gray"><td style="width: 40%;">หัวข้อการประเมิน</td><td style="width: 15%;">ผ่าน</td><td style="width: 15%;">ไม่ผ่าน</td><td style="width: 30%;">หมายเหตุ</td></tr>
+    <tr><td>ทดสอบคณิตศาสตร์</td><td></td><td></td><td>................. / 30 คะแนน</td></tr>
+    <tr><td>ทดสอบเรียงไพ่</td><td></td><td></td><td>ครั้งที่ 1 ........... นาที ผิด ........... จุด<br>ครั้งที่ 2 ........... นาที ผิด ........... จุด</td></tr>
+    <tr><td>ทดสอบสมรรถภาพร่างกาย</td><td></td><td></td><td>ลุกนั่ง ......................... ครั้ง/1นาที<br>ซิทอัพ ......................... ครั้ง/1นาที<br>วิดพื้น ......................... ครั้ง/1นาที</td></tr>
+    <tr><td colspan="4" style="font-size: 14px; background-color: #f8fafc;"><span style="font-weight: bold; text-decoration: underline;">วิธีการประเมินและทดสอบ</span><br>1. คุณสมบัติเบื้องต้น : พิจารณาตามเกณฑ์<br>2. การทดสอบคณิตศาสตร์ : 30 ข้อ เวลา 10 นาที ผ่านเกณฑ์การประเมิน 15 ข้อขึ้นไป<br>3. ทดสอบเรียงไพ่ : <br>&nbsp;&nbsp; - แยกสีดำ สีแดง<br>&nbsp;&nbsp; - แยกประเภทของไพ่ ดอกจิก หัวใจ โพดำ ข้าวหลามตัด<br>&nbsp;&nbsp; - เรียงจากจำนวนน้อยไปหาจำนวนมาก A-10 และ ตามด้วย J,Q,K<br>&nbsp;&nbsp; - เวลา 5 นาที และสามารถทำซ้ำได้ 2 รอบ<br>ทดสอบสมรรถภาพ : วิดพื้น ลุกนั่ง และซิทอัพ เวลา 1 นาที ผ่านเกณฑ์การประเมิน 30 ครั้งขึ้นไป</td></tr>
   </table>
-
-  <div style="text-align: center; margin: 20px 0;">
-    <span style="border: 2px solid #000; padding: 5px 20px; font-weight: bold;">
-      สรุปผลการรับสมัคร &nbsp;&nbsp;&nbsp;&nbsp; ☐ ผ่าน &nbsp;&nbsp;&nbsp;&nbsp; ☐ ไม่ผ่าน
-    </span>
-  </div>
-
-  <div style="margin-top: 20px; line-height: 2; font-size: 18px;">
-    <strong>รายละเอียดเพิ่มเติม (สำหรับเจ้าหน้าที่)</strong><br>
-    .............................................................................................................................................................................................................<br>
-    .............................................................................................................................................................................................................<br>
-    .............................................................................................................................................................................................................<br>
-    .............................................................................................................................................................................................................<br>
-    .............................................................................................................................................................................................................<br>
-  </div>
-
+  <div style="text-align: center; margin: 20px 0;"><span style="border: 2px solid #000; padding: 5px 20px; font-weight: bold;">สรุปผลการรับสมัคร &nbsp;&nbsp;&nbsp;&nbsp; ☐ ผ่าน &nbsp;&nbsp;&nbsp;&nbsp; ☐ ไม่ผ่าน</span></div>
+  <div style="margin-top: 20px; line-height: 2; font-size: 18px;"><strong>รายละเอียดเพิ่มเติม (สำหรับเจ้าหน้าที่)</strong><br>.............................................................................................................................................................................................................<br>.............................................................................................................................................................................................................<br>.............................................................................................................................................................................................................<br>.............................................................................................................................................................................................................<br>.............................................................................................................................................................................................................<br></div>
   <div style="margin-top: 40px; display: flex; justify-content: space-between; font-size: 18px;">
-    <div style="width: 45%;">
+    <div style="width: 40%;">
       ลงชื่อ ......................................................... ผู้ประเมิน<br><br>
       วันที่ ...................................................
     </div>
-    <div style="width: 45%; text-align: right;">
-      ลงชื่อ <span class="data-text" style="display:inline-block; min-width: 200px; border-bottom: 2px dotted #000; text-align: center; margin: 0 10px; padding-bottom: 2px;"><?= data.titleTh ?><?= data.fullNameTh ?></span> ผู้สมัคร
+    <div style="width: 55%; text-align: right; white-space: nowrap;">
+      ลงชื่อ <span class="data-text" style="display:inline-block; min-width: 200px; border-bottom: 2px dotted #000; text-align: center; margin: 0 5px; padding-bottom: 2px;"><?= data.titleTh ?><?= data.fullNameTh ?></span> ผู้สมัคร
     </div>
   </div>
-
 </div>
-
 </body>
 </html>
-
-
-
-
-
-
-
-
-
